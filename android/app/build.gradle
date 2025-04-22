@@ -1,0 +1,108 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    // throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+<<<<<<< HEAD
+    flutterVersionCode = '3'
+=======
+<<<<<<< HEAD
+    flutterVersionCode = '3'
+=======
+    flutterVersionCode = '4'
+>>>>>>> 0fd8259e7a878f14150cd1ec6304359d24075ee0
+>>>>>>> 5721eff19252b4446c115386bbe9a8e7b7f51daa
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+<<<<<<< HEAD
+    flutterVersionName = '3'
+=======
+<<<<<<< HEAD
+    flutterVersionName = '3'
+=======
+    flutterVersionName = '4'
+>>>>>>> 0fd8259e7a878f14150cd1ec6304359d24075ee0
+>>>>>>> 5721eff19252b4446c115386bbe9a8e7b7f51daa
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    namespace "com.cognistar.app"
+    compileSdk 34
+    ndkVersion "26.1.10909125"
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+
+    defaultConfig {
+        applicationId = "com.cognistar.app"
+        minSdk = 24 // Update minSdkVersion to 23
+        targetSdk = 34 // Update targetSdkVersion to a value that matches your targetSdkVersion
+        versionCode = flutterVersionCode.toInteger()
+        versionName = flutterVersionName
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false  // Disable Proguard
+            shrinkResources false
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'com.facebook.android:facebook-android-sdk:[8,9)'
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
+
+}
+
+apply plugin: 'com.google.gms.google-services'
