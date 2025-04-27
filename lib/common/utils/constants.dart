@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Constants {
-  static const dommain = 'https://noon-3allemny.com';
+  static const dommain = 'https://cognistar.net';
   static const baseUrl = '$dommain/api/development/';
   static const apiKey = '1234';
   static const scheme = 'academyapp';

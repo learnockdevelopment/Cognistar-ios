@@ -1,4 +1,4 @@
-# Noon Alemny flutter app
+# Cognistar Academy flutter app
 
 ## Getting Started
 

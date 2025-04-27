@@ -57,7 +57,7 @@
 
 
     <application
-        android:label="Noon Alemny"
+        android:label="Cognistar Academy"
         android:usesCleartextTraffic="true"
         android:name="${applicationName}"
 <<<<<<< HEAD

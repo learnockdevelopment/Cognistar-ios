@@ -467,110 +467,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ],
                             ),
 
-                            /* Image Slider
-
-                                  // Image Slider
-                                  Column(
-                                    children: [
-                                      // slider
-                                      SizedBox(
-                                        width: getSize().width,
-                                        height: 200,
-                                        child: PageView.builder(
-                                          itemCount: 3,
-                                          controller: adSliderPageController,
-                                          onPageChanged: (value) {
-                                            setState(() {
-                                              currentAdSliderIndex = value;
-                                            });
-                                          },
-                                          physics: const BouncingScrollPhysics(),
-                                          itemBuilder: (context, index) {
-                                            return HomeWidget.sliderItem('https://anthropologyandculture.com/wp-content/uploads/2021/03/61632315.jpg',(){
-
-                                            });
-                                          },
-                                        ),
-                                      ),
-
-                                      space(16),
-
-                                      // indecator
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          ...List.generate(3, (index) {
-                                            return AnimatedContainer(
-                                              duration: const Duration(milliseconds: 300),
-                                              width: currentAdSliderIndex == index ? 16 : 7,
-                                              height: 7,
-                                              margin: padding(horizontal: 2),
-                                              decoration: BoxDecoration(
-                                                color: green77(),
-                                                borderRadius: borderRadius()
-                                              ),
-                                            );
-
-                                          }),
-                                        ],
-                                      ),
-
-                                    ],
-                                  ),
-                                  */
-                            //
-                            // space(22),
-                            // Container(
-                            //   padding: padding(horizontal: 16),
-                            //   margin: padding(),
-                            //   width: getSize().width,
-                            //   height: 165,
-                            //   decoration: BoxDecoration(
-                            //     color: Colors.white,
-                            //     borderRadius: borderRadius(),
-                            //   ),
-                            //   child: Row(
-                            //     mainAxisAlignment:
-                            //         MainAxisAlignment.spaceBetween,
-                            //     children: [
-                            //       Column(
-                            //         crossAxisAlignment:
-                            //             CrossAxisAlignment.start,
-                            //         mainAxisAlignment: MainAxisAlignment.center,
-                            //         children: [
-                            //           Text(
-                            //             appText.freeCourses,
-                            //             style: style20Bold(),
-                            //           ),
-                            //           space(4),
-                            //           Text(
-                            //             appText.bySpendingPoints,
-                            //             style: style12Regular()
-                            //                 .copyWith(color: greyB2),
-                            //           ),
-                            //           space(8),
-                            //           button(
-                            //               onTap: () {
-                            //                 locator<FilterCourseProvider>()
-                            //                     .clearFilter();
-                            //                 locator<FilterCourseProvider>()
-                            //                     .rewardCourse = true;
-                            //                 nextRoute(
-                            //                     FilterCategoryPage.pageName);
-                            //               },
-                            //               width: 75,
-                            //               height: 32,
-                            //               text: appText.view,
-                            //               bgColor: green77(),
-                            //               textColor: Colors.white,
-                            //               raduis: 10)
-                            //         ],
-                            //       ),
-                            //       SvgPicture.asset(AppAssets.pointsMedalSvg)
-                            //     ],
-                            //   ),
-                            // ),
-
                             space(10),
 
                             // Best Selling
@@ -648,35 +544,42 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ),
                             },
 
-                            // Free Classes
-                            Column(
-                              children: [
-                                HomeWidget.titleAndMore(appText.freeClasses,
-                                    onTapViewAll: () {
-                                  locator<FilterCourseProvider>().clearFilter();
-                                  locator<FilterCourseProvider>().free = true;
-                                  nextRoute(FilterCategoryPage.pageName);
-                                }),
-                                SizedBox(
-                                  width: getSize().width,
-                                  child: SingleChildScrollView(
-                                    physics: const BouncingScrollPhysics(),
-                                    padding: padding(),
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: List.generate(
-                                          isLoadingFreeListData
-                                              ? 3
-                                              : freeListData.length, (index) {
-                                        return isLoadingFreeListData
-                                            ? courseItemShimmer()
-                                            : courseItem(freeListData[index]);
-                                      }),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
+                            if (freeListData.isNotEmpty ||
+                                isLoadingFreeListData) ...{
+                              if (freeListData.isNotEmpty)
+                                Column(
+                                  children: [
+                                    HomeWidget.titleAndMore(appText.freeClasses,
+                                        onTapViewAll: () {
+                                      locator<FilterCourseProvider>()
+                                          .clearFilter();
+                                      locator<FilterCourseProvider>().free =
+                                          true;
+                                      nextRoute(FilterCategoryPage.pageName);
+                                    }),
+                                    SizedBox(
+                                      width: getSize().width,
+                                      child: SingleChildScrollView(
+                                        physics: const BouncingScrollPhysics(),
+                                        padding: padding(),
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: List.generate(
+                                              isLoadingFreeListData
+                                                  ? 3
+                                                  : freeListData.length,
+                                              (index) {
+                                            return isLoadingFreeListData
+                                                ? courseItemShimmer()
+                                                : courseItem(
+                                                    freeListData[index]);
+                                          }),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                            },
 
                             space(150),
                           ],

@@ -21,7 +21,7 @@
             "package_name": "com.cognistar.app",
             "certificate_hash": "5f8f943d5f2bb45e3f577fcff9ca7eebac1bccfe"
 =======
-            "package_name": "com.noon3lemny.app",
+            "package_name": "",
             "certificate_hash": "54a4fcc6c3259716e2af2ec3d28d4c7f0e656abe"
 >>>>>>> 5721eff19252b4446c115386bbe9a8e7b7f51daa
           }
@@ -34,7 +34,7 @@
             "package_name": "com.cognistar.app",
             "certificate_hash": "22d83df9e8f8d9aaac52f44dad5d9f33219fb13b"
 =======
-            "package_name": "com.noon3lemny.app",
+            "package_name": "",
             "certificate_hash": "7347fb96244953332292e227183104f40845b378"
 >>>>>>> 5721eff19252b4446c115386bbe9a8e7b7f51daa
           }
@@ -55,7 +55,7 @@
             "package_name": "com.cognistar.app",
             "certificate_hash": "5840047603a3f82f658f54017cebc9fdf0ec87df"
 =======
-            "package_name": "com.noon3lemny.app",
+            "package_name": "",
             "certificate_hash": "306b7d58b719f4ea1d2ed7174cd41f15567c5b22"
 >>>>>>> 5721eff19252b4446c115386bbe9a8e7b7f51daa
           }
@@ -81,7 +81,7 @@
               "client_id": "294546944998-n4ofvat255odfgksh54i42tqresrhqds.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.noon3lemny.app"
+                "bundle_id": ""
               }
             }
           ]

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 Color? backgroundColor = Colors.grey[200];
 
 // Primary colors
-const Color primaryColor = Color(0xffc100ae); // Example: Blue
+const Color primaryColor = Color.fromARGB(255, 8, 148, 255); // Example: Blue
 const Color primaryColor2 = Color(0xffcfe9f8); // Light
 const Color secondaryColor = Color(0xff3ec0c4); // Example: Green
 

@@ -6,6 +6,7 @@ import 'package:webinar/app/pages/authentication_page/login_page.dart';
 import 'package:webinar/app/pages/main_page/home_page/single_course_page/learning_page.dart';
 import 'package:webinar/app/providers/user_provider.dart';
 import 'package:webinar/app/services/guest_service/course_service.dart';
+import 'package:webinar/app/services/storage_service.dart.dart';
 import 'package:webinar/app/services/user_service/cart_service.dart';
 import 'package:webinar/app/services/user_service/purchase_service.dart';
 import 'package:webinar/app/widgets/main_widget/home_widget/single_course_widget/pod_video_player.dart';
@@ -263,7 +264,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                 },
               ),
               actions: [
-                
+                if (StorageService.getCanPurchase())
                   IconButton(
                     icon: Icon(Icons.shopping_cart, color: Colors.black),
                     onPressed: () {
@@ -274,7 +275,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                         nextRoute(CartPage.pageName);
                     },
                   ),
-                
+                if (StorageService.getCanPurchase())
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0), // Optional padding between icons
@@ -578,236 +579,162 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                           } else ...{
                             // information buttons
                             AnimatedPositioned(
-                                duration: const Duration(milliseconds: 350),
-                                bottom: showInformationButton ? 0 : -150,
-                                child: Container(
-                                    width: MediaQuery.of(context).size.width,
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 30),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        boxShadow: [
-                                          boxShadow(
-                                              Colors.black.withOpacity(.1),
-                                              blur: 15,
-                                              y: -3)
-                                        ],
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                                top: Radius.circular(30))),
-                                    child: Column(
-                                      children: [
-                                        // price or percent
-                                        if ((courseData?.authHasBought ==
-                                            false)) ...{
-                                          if (token.isNotEmpty) ...{
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  appText.price,
-                                                  style: style14Regular()
-                                                      .copyWith(color: greyA5),
-                                                ),
-                                                const Spacer(),
-                                                Text(
-                                                  ((courseData?.price ?? 0) ==
-                                                          0)
-                                                      ? appText.free
-                                                      : CurrencyUtils
-                                                          .calculator(
-                                                              courseData!
-                                                                      .price ??
-                                                                  0),
-                                                  style:
-                                                      style12Regular().copyWith(
-                                                    color:
-                                                        (courseData!.discountPercent ??
-                                                                    0) >
-                                                                0
-                                                            ? greyCF
-                                                            : green77(),
-                                                    decoration: (courseData!
-                                                                    .discountPercent ??
+                              duration: const Duration(milliseconds: 350),
+                              bottom: showInformationButton ? 0 : -150,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                padding: const EdgeInsets.only(
+                                    left: 20, right: 20, top: 20, bottom: 30),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    boxShadow(Colors.black.withOpacity(.1),
+                                        blur: 15, y: -3)
+                                  ],
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(30)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    // price or percent
+                                    if ((courseData?.authHasBought ==
+                                        false)) ...{
+                                      if (token.isNotEmpty) ...{
+                                        Row(
+                                          children: [
+                                            Text(
+                                              appText.price,
+                                              style: style14Regular()
+                                                  .copyWith(color: greyA5),
+                                            ),
+                                            const Spacer(),
+                                            Text(
+                                              ((courseData?.price ?? 0) == 0)
+                                                  ? appText.free
+                                                  : CurrencyUtils.calculator(
+                                                      courseData!.price ?? 0),
+                                              style: style12Regular().copyWith(
+                                                color:
+                                                    (courseData!.discountPercent ??
                                                                 0) >
                                                             0
-                                                        ? TextDecoration
-                                                            .lineThrough
-                                                        : TextDecoration.none,
-                                                    decorationColor:
-                                                        (courseData!.discountPercent ??
-                                                                    0) >
-                                                                0
-                                                            ? greyCF
-                                                            : green77(),
-                                                  ),
-                                                ),
-                                                if ((courseData!
-                                                            .discountPercent ??
-                                                        0) >
-                                                    0) ...{
-                                                  space(0, width: 8),
-                                                  Text(
-                                                    CurrencyUtils.calculator(
-                                                        (courseData!.price ??
-                                                                0) -
-                                                            ((courseData!
-                                                                        .price ??
-                                                                    0) *
-                                                                (courseData!
-                                                                        .discountPercent ??
-                                                                    0) ~/
-                                                                100)),
-                                                    style: style14Regular()
-                                                        .copyWith(
-                                                      color: green77(),
-                                                    ),
-                                                  ),
-                                                },
-                                              ],
+                                                        ? greyCF
+                                                        : green77(),
+                                                decoration: (courseData!
+                                                                .discountPercent ??
+                                                            0) >
+                                                        0
+                                                    ? TextDecoration.lineThrough
+                                                    : TextDecoration.none,
+                                                decorationColor:
+                                                    (courseData!.discountPercent ??
+                                                                0) >
+                                                            0
+                                                        ? greyCF
+                                                        : green77(),
+                                              ),
                                             ),
-                                            space(16),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                    child: button(
-                                                        onTap: () async {
-                                                          if (((courseData
-                                                                      ?.price ??
-                                                                  0) ==
-                                                              0)) {
-                                                            setState(() {
-                                                              isEnrollLoading =
-                                                                  true;
-                                                            });
+                                            if ((courseData!.discountPercent ??
+                                                    0) >
+                                                0) ...{
+                                              space(0, width: 8),
+                                              Text(
+                                                CurrencyUtils.calculator(
+                                                    (courseData!.price ?? 0) -
+                                                        ((courseData!.price ??
+                                                                0) *
+                                                            (courseData!
+                                                                    .discountPercent ??
+                                                                0) ~/
+                                                            100)),
+                                                style:
+                                                    style14Regular().copyWith(
+                                                  color: green77(),
+                                                ),
+                                              ),
+                                            },
+                                          ],
+                                        ),
+                                        space(16),
+                                        Row(
+                                          children: [
+                                            // Check if course is free
+                                            if ((courseData?.price ?? 0) ==
+                                                0) ...{
+                                              // Show Enroll Button if free
+                                              Expanded(
+                                                child: button(
+                                                  onTap: () async {
+                                                    setState(() {
+                                                      isEnrollLoading = true;
+                                                    });
 
-                                                            bool res = isBundleCourse
-                                                                ? await PurchaseService
-                                                                    .bundlesFree(
-                                                                        courseData!
-                                                                            .id!)
-                                                                : await PurchaseService
-                                                                    .courseFree(
-                                                                        courseData!
-                                                                            .id!);
+                                                    bool res = isBundleCourse
+                                                        ? await PurchaseService
+                                                            .bundlesFree(
+                                                                courseData!.id!)
+                                                        : await PurchaseService
+                                                            .courseFree(
+                                                                courseData!
+                                                                    .id!);
 
-                                                            if (res) {
-                                                              getData();
-                                                            }
+                                                    if (res) {
+                                                      getData();
+                                                    }
 
-                                                            setState(() {
-                                                              isEnrollLoading =
-                                                                  false;
-                                                            });
+                                                    setState(() {
+                                                      isEnrollLoading = false;
+                                                    });
+                                                  },
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  height: 52,
+                                                  text: appText.enrollOnClass,
+                                                  bgColor: green77(),
+                                                  textColor: Colors.white,
+                                                  isLoading: isEnrollLoading,
+                                                ),
+                                              ),
+                                            } else if (StorageService
+                                                .getCanPurchase()) ...{
+                                              // Show Subscribe Button if course is not free and can be purchased
+                                              Expanded(
+                                                child: button(
+                                                  onTap: () async {
+                                                    setState(() {
+                                                      isSubscribeLoading = true;
+                                                    });
 
-                                                            return;
-                                                          }
+                                                    bool res = await CartService
+                                                        .subscribeApplay(
+                                                            context,
+                                                            courseData!.id!);
 
-                                                          if (courseData!
-                                                                  .tickets
-                                                                  .isNotEmpty ||
-                                                              (courseData!.points !=
-                                                                      null &&
-                                                                  courseData!
-                                                                          .points !=
-                                                                      0)) {
-                                                            SingleCourseWidget
-                                                                    .pricingPlanDialog(
-                                                                        courseData!)
-                                                                .then((value) {
-                                                              if (value !=
-                                                                      null &&
-                                                                  value) {
-                                                                courseData =
-                                                                    null;
-                                                                getData();
-                                                              }
-                                                            });
-                                                            return;
-                                                          } else {
-                                                            setState(() {
-                                                              isEnrollLoading =
-                                                                  true;
-                                                            });
-                                                            await CartService.add(
-                                                                context,
-                                                                courseData?.id
-                                                                        ?.toString() ??
-                                                                    '',
-                                                                isBundleCourse
-                                                                    ? 'bundle'
-                                                                    : 'webinar',
-                                                                '');
+                                                    if (res) {
+                                                      getData();
+                                                    }
 
-                                                            setState(() {
-                                                              isEnrollLoading =
-                                                                  false;
-                                                              getData();
-                                                            });
-                                                          }
-                                                        },
-                                                        width: MediaQuery.of(
-                                                                context)
-                                                            .size
-                                                            .width,
-                                                        height: 52,
-                                                        text: appText
-                                                            .enrollOnClass,
-                                                        bgColor: green77(),
-                                                        textColor: Colors.white,
-                                                        isLoading:
-                                                            isEnrollLoading)),
-                                                if (courseData?.subscribe ??
-                                                    false) ...{
-                                                  space(0, width: 16),
-                                                  Expanded(
-                                                      child: button(
-                                                          onTap: () async {
-                                                            setState(() {
-                                                              isSubscribeLoading =
-                                                                  true;
-                                                            });
-
-                                                            bool res = await CartService
-                                                                .subscribeApplay(
-                                                                    context,
-                                                                    courseData!
-                                                                        .id!);
-
-                                                            if (res) {
-                                                              getData();
-                                                            }
-
-                                                            setState(() {
-                                                              isSubscribeLoading =
-                                                                  false;
-                                                              getData();
-                                                            });
-                                                          },
-                                                          width: MediaQuery.of(
-                                                                  context)
-                                                              .size
-                                                              .width,
-                                                          height: 52,
-                                                          text:
-                                                              appText.subscribe,
-                                                          bgColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          textColor: green77(),
-                                                          borderColor:
-                                                              green77(),
-                                                          isLoading:
-                                                              isSubscribeLoading,
-                                                          loadingColor:
-                                                              green77())),
-                                                }
-                                              ],
-                                            )
-                                          } else ...{
-                                            button(
+                                                    setState(() {
+                                                      isSubscribeLoading =
+                                                          false;
+                                                    });
+                                                  },
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  height: 52,
+                                                  text: appText.subscribe,
+                                                  bgColor: Colors.transparent,
+                                                  textColor: green77(),
+                                                  borderColor: green77(),
+                                                  isLoading: isSubscribeLoading,
+                                                  loadingColor: green77(),
+                                                ),
+                                              ),
+                                            } else ...{
+                                              // Show all buttons if can't purchase and course is not free
+                                              button(
                                                 onTap: () {
                                                   nextRoute(LoginPage.pageName,
                                                       isClearBackRoutes: true);
@@ -818,79 +745,91 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                                 height: 53,
                                                 text: appText.login,
                                                 bgColor: green77(),
-                                                textColor: Colors.white),
-                                          }
-                                        } else ...{
-                                          // progress
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${courseData?.progressPercent ?? 0}% ${appText.completed}',
-                                                style: style10Regular()
-                                                    .copyWith(color: greyA5),
+                                                textColor: Colors.white,
                                               ),
-                                              space(6),
-                                              LayoutBuilder(
-                                                builder:
-                                                    (context, constraints) {
-                                                  return Container(
-                                                    width: constraints.maxWidth,
-                                                    height: 4,
-                                                    alignment:
-                                                        AlignmentDirectional
-                                                            .centerStart,
-                                                    child: Container(
-                                                      width: ((courseData
-                                                                      ?.progressPercent ??
-                                                                  0) >
-                                                              0)
-                                                          ? constraints
-                                                                  .maxWidth *
-                                                              ((courseData?.progressPercent ??
-                                                                      0) /
-                                                                  100)
-                                                          : 5,
-                                                      height: 4,
-                                                      decoration: BoxDecoration(
-                                                        color: green77(),
-                                                        borderRadius:
-                                                            borderRadius(),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                              space(12),
-                                              button(
-                                                  onTap: () {
-                                                    if (courseData?.type ==
-                                                        'bundle') {
-                                                      tabController
-                                                          .animateTo(1);
-                                                    } else {
-                                                      nextRoute(
-                                                          LearningPage.pageName,
-                                                          arguments:
-                                                              courseData);
-                                                    }
-                                                  },
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  height: 52,
-                                                  text:
-                                                      appText.goToLearningPage,
-                                                  bgColor: green77(),
-                                                  textColor: Colors.white,
-                                                  raduis: 15)
-                                            ],
+                                            }
+                                          ],
+                                        )
+                                      } else ...{
+                                        button(
+                                          onTap: () {
+                                            nextRoute(LoginPage.pageName,
+                                                isClearBackRoutes: true);
+                                          },
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height: 53,
+                                          text: appText.login,
+                                          bgColor: green77(),
+                                          textColor: Colors.white,
+                                        ),
+                                      }
+                                    } else ...{
+                                      // progress
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${courseData?.progressPercent ?? 0}% ${appText.completed}',
+                                            style: style10Regular()
+                                                .copyWith(color: greyA5),
                                           ),
-                                        },
-                                      ],
-                                    ))),
-
+                                          space(6),
+                                          LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              return Container(
+                                                width: constraints.maxWidth,
+                                                height: 4,
+                                                alignment: AlignmentDirectional
+                                                    .centerStart,
+                                                child: Container(
+                                                  width: ((courseData
+                                                                  ?.progressPercent ??
+                                                              0) >
+                                                          0)
+                                                      ? constraints.maxWidth *
+                                                          ((courseData?.progressPercent ??
+                                                                  0) /
+                                                              100)
+                                                      : 5,
+                                                  height: 4,
+                                                  decoration: BoxDecoration(
+                                                    color: green77(),
+                                                    borderRadius:
+                                                        borderRadius(),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          space(12),
+                                          button(
+                                            onTap: () {
+                                              if (courseData?.type ==
+                                                  'bundle') {
+                                                tabController.animateTo(1);
+                                              } else {
+                                                nextRoute(LearningPage.pageName,
+                                                    arguments: courseData);
+                                              }
+                                            },
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: 52,
+                                            text: appText.goToLearningPage,
+                                            bgColor: green77(),
+                                            textColor: Colors.white,
+                                            raduis: 15,
+                                          ),
+                                        ],
+                                      ),
+                                    }
+                                  ],
+                                ),
+                              ),
+                            ),
                             if ((courseData?.authHasBought ?? false)) ...{
                               // write a review
                               AnimatedPositioned(
