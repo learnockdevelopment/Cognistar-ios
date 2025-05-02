@@ -1,20 +1,23 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:webinar/app/models/content_model.dart';
 import 'package:webinar/app/models/course_model.dart';
 import 'package:webinar/app/models/single_course_model.dart';
 import 'package:webinar/app/pages/authentication_page/login_page.dart';
 import 'package:webinar/app/pages/main_page/home_page/single_course_page/learning_page.dart';
 import 'package:webinar/app/providers/user_provider.dart';
 import 'package:webinar/app/services/guest_service/course_service.dart';
-import 'package:webinar/app/services/storage_service.dart.dart';
+import 'package:webinar/app/services/storage_service.dart';
 import 'package:webinar/app/services/user_service/cart_service.dart';
 import 'package:webinar/app/services/user_service/purchase_service.dart';
-import 'package:webinar/app/widgets/main_widget/home_widget/single_course_widget/pod_video_player.dart';
-import 'package:webinar/common/components.dart';
+import 'package:webinar/app/widgets/main_widget/blog_widget/blog_widget.dart';
 import 'package:webinar/app/widgets/main_widget/home_widget/single_course_widget/course_video_player.dart';
+import 'package:webinar/app/widgets/main_widget/home_widget/single_course_widget/pod_video_player.dart';
 import 'package:webinar/app/widgets/main_widget/home_widget/single_course_widget/single_course_widget.dart';
 import 'package:webinar/app/widgets/main_widget/home_widget/single_course_widget/special_offer_widget.dart';
 import 'package:webinar/common/common.dart';
+import 'package:webinar/common/components.dart';
 import 'package:webinar/common/data/api_public_data.dart';
 import 'package:webinar/common/data/app_data.dart';
 import 'package:webinar/common/utils/app_text.dart';
@@ -23,14 +26,10 @@ import 'package:webinar/config/assets.dart';
 import 'package:webinar/config/colors.dart';
 import 'package:webinar/config/styles.dart';
 import 'package:webinar/locator.dart';
-import '../../../../../common/enums/error_enum.dart';
+
+import '../../../../../common/data/app_language.dart';
 import '../../../../../common/shimmer_component.dart';
-import '../../../../widgets/floating dev id.dart';
 import '../../../../../common/utils/currency_utils.dart';
-import '../../../../models/content_model.dart';
-import '../../../../widgets/main_widget/blog_widget/blog_widget.dart';
-import '../../../../widgets/qr.dart';
-import '../cart_page/cart_page.dart';
 
 class SingleCoursePage extends StatefulWidget {
   static const String pageName = '/single-course';
@@ -64,7 +63,9 @@ class _SingleCoursePageState extends State<SingleCoursePage>
   bool isBundleCourse = false;
   List<CourseModel> bundleCourses = [];
   List<ContentModel> contentData = [];
+
   int? commentId;
+  Timer? _commentTimer;
 
   bool isLoading2 = true; // Start with shimmer visible
   bool isVideoReady = false; // To track if the video is ready to show
@@ -147,64 +148,39 @@ class _SingleCoursePageState extends State<SingleCoursePage>
 
   getData() async {
     token = await AppData.getAccessToken();
+    if (!mounted) return;
+
     setState(() {
       isLoading = true;
     });
 
-    // Getting the course ID (bundle id or course id)
     int id = courseData?.id ??
-        ((ModalRoute.of(context)?.settings.arguments as List?)?.first ?? 0);
-    print('Course/Bundled ID: $id'); // Log the course or bundle ID here
+        (ModalRoute.of(context)?.settings.arguments as List?)?.first ??
+        0;
+    isBundleCourse = courseData?.type == 'bundle' ??
+        (ModalRoute.of(context)!.settings.arguments as List)[1];
 
-    // Determine if this is a bundle course
-    isBundleCourse = courseData != null
-        ? courseData?.type == 'bundle'
-        : (ModalRoute.of(context)!.settings.arguments as List)[1];
-    print(
-        'Is Bundle Course: $isBundleCourse'); // Log if it's a bundle course or not
-
-    // Store the ID and type for use in other pages
-    if (isBundleCourse) {
-      // Store bundle ID if it's a bundle course
-      AppData.setBundleId(id);
-      AppData.setCourseId(null); // Set course ID as null if it's a bundle
-    } else {
-      // Store course ID if it's not a bundle
-      AppData.setCourseId(id);
-      AppData.setBundleId(null); // Set bundle ID as null if it's not a bundle
-    }
-
-    try {
-      commentId =
-          commentId ?? (ModalRoute.of(context)!.settings.arguments as List)[2];
-    } catch (_) {}
-
-    try {
-      isPrivate = (ModalRoute.of(context)!.settings.arguments as List)[3];
-    } catch (_) {}
-
-    // Fetching course data
     courseData = await CourseService.getSingleCourseData(id, isBundleCourse,
         isPrivate: isPrivate);
+    if (!mounted) return;
 
-    // Check if it's a bundle course and fetch the bundle courses
     if (courseData != null && isBundleCourse) {
-      getBundleCourses();
+      await getBundleCourses();
     }
 
-    // Fetch regular content if it's not a bundle course
     if (!isBundleCourse) {
-      getContent();
+      await getContent();
     }
 
-    // Show comment section if commentId is available
     if (commentId != null) {
-      showComment();
+      await showComment();
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -228,72 +204,44 @@ class _SingleCoursePageState extends State<SingleCoursePage>
     currentTab = 3;
     tabController.animateTo(3);
 
-    Timer(const Duration(seconds: 2), () {
+    _commentTimer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+
       for (var i = 0; i < (courseData?.comments.length ?? 0); i++) {
         if (commentId == courseData?.comments[i].id) {
-          // ////printcourseData?.comments[i].globalKey.findWidget);
           scrollController.animateTo(
-              (courseData!.comments[i].globalKey.findWidget ?? 0.0) > 230
-                  ? (courseData!.comments[i].globalKey.findWidget ?? 0.0) - 230
-                  : 0,
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.linearToEaseOut);
+            (courseData!.comments[i].globalKey.findWidget ?? 0.0) > 230
+                ? (courseData!.comments[i].globalKey.findWidget ?? 0.0) - 230
+                : 0,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.linearToEaseOut,
+          );
         }
       }
-
       commentId = null;
     });
 
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _commentTimer?.cancel(); // Cancel the timer
+    tabController.dispose();
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return directionality(
+    return Directionality(
+        textDirection: locator<AppLanguage>().currentLanguage == 'ar'
+            ? TextDirection.rtl
+            : TextDirection.ltr,
         child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              title: Text(
-                appText.courseDetails,
-                style: TextStyle(color: Colors.black),
-              ),
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              actions: [
-                if (StorageService.getCanPurchase())
-                  IconButton(
-                    icon: Icon(Icons.shopping_cart, color: Colors.black),
-                    onPressed: () {
-                      if (token.isEmpty) {
-                        nextRoute(LoginPage.pageName);
-                        showSnackBar(ErrorEnum.alert, appText.loginDesc);
-                      } else
-                        nextRoute(CartPage.pageName);
-                    },
-                  ),
-                if (StorageService.getCanPurchase())
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0), // Optional padding between icons
-
-                    child: IconButton(
-                      icon: Icon(Icons.qr_code_scanner,
-                          color: Colors.black), // Scanner icon with black color
-                      onPressed: () {
-                        if (token.isEmpty) {
-                          nextRoute(LoginPage.pageName);
-                          showSnackBar(ErrorEnum.alert, appText.loginDesc);
-                        } else
-                          nextRoute(ScannerPage.pageName);
-                      },
-                    ),
-                  ),
-              ],
-            ),
+            appBar: appbar(isBasket: true, title: ''),
             body: isLoading
                 // ? loading()
                 ? singleCourseShimmer()
@@ -579,162 +527,247 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                           } else ...{
                             // information buttons
                             AnimatedPositioned(
-                              duration: const Duration(milliseconds: 350),
-                              bottom: showInformationButton ? 0 : -150,
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                padding: const EdgeInsets.only(
-                                    left: 20, right: 20, top: 20, bottom: 30),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    boxShadow(Colors.black.withOpacity(.1),
-                                        blur: 15, y: -3)
-                                  ],
-                                  borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(30)),
-                                ),
-                                child: Column(
-                                  children: [
-                                    // price or percent
-                                    if ((courseData?.authHasBought ==
-                                        false)) ...{
-                                      if (token.isNotEmpty) ...{
-                                        Row(
-                                          children: [
-                                            Text(
-                                              appText.price,
-                                              style: style14Regular()
-                                                  .copyWith(color: greyA5),
-                                            ),
-                                            const Spacer(),
-                                            Text(
-                                              ((courseData?.price ?? 0) == 0)
-                                                  ? appText.free
-                                                  : CurrencyUtils.calculator(
-                                                      courseData!.price ?? 0),
-                                              style: style12Regular().copyWith(
-                                                color:
-                                                    (courseData!.discountPercent ??
-                                                                0) >
-                                                            0
-                                                        ? greyCF
-                                                        : green77(),
-                                                decoration: (courseData!
-                                                                .discountPercent ??
-                                                            0) >
-                                                        0
-                                                    ? TextDecoration.lineThrough
-                                                    : TextDecoration.none,
-                                                decorationColor:
-                                                    (courseData!.discountPercent ??
-                                                                0) >
-                                                            0
-                                                        ? greyCF
-                                                        : green77(),
-                                              ),
-                                            ),
-                                            if ((courseData!.discountPercent ??
-                                                    0) >
-                                                0) ...{
-                                              space(0, width: 8),
-                                              Text(
-                                                CurrencyUtils.calculator(
-                                                    (courseData!.price ?? 0) -
-                                                        ((courseData!.price ??
-                                                                0) *
-                                                            (courseData!
-                                                                    .discountPercent ??
-                                                                0) ~/
-                                                            100)),
-                                                style:
-                                                    style14Regular().copyWith(
-                                                  color: green77(),
-                                                ),
-                                              ),
-                                            },
-                                          ],
-                                        ),
-                                        space(16),
-                                        Row(
-                                          children: [
-                                            // Check if course is free
-                                            if ((courseData?.price ?? 0) ==
-                                                0) ...{
-                                              // Show Enroll Button if free
-                                              Expanded(
-                                                child: button(
-                                                  onTap: () async {
-                                                    setState(() {
-                                                      isEnrollLoading = true;
-                                                    });
-
-                                                    bool res = isBundleCourse
-                                                        ? await PurchaseService
-                                                            .bundlesFree(
-                                                                courseData!.id!)
-                                                        : await PurchaseService
-                                                            .courseFree(
+                                duration: const Duration(milliseconds: 350),
+                                bottom: showInformationButton ? 0 : -150,
+                                child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    padding: const EdgeInsets.only(
+                                        left: 20,
+                                        right: 20,
+                                        top: 20,
+                                        bottom: 30),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          boxShadow(
+                                              Colors.black.withOpacity(.1),
+                                              blur: 15,
+                                              y: -3)
+                                        ],
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                                top: Radius.circular(30))),
+                                    child: Column(
+                                      children: [
+                                        // price or percent
+                                        if ((courseData?.authHasBought ==
+                                            false)) ...{
+                                          if (token.isNotEmpty) ...{
+                                            Row(
+                                              children: [
+                                                if (StorageService
+                                                    .getCanPurchase())
+                                                  Text(
+                                                    appText.price,
+                                                    style: style14Regular()
+                                                        .copyWith(
+                                                            color: greyA5),
+                                                  ),
+                                                const Spacer(),
+                                                if (StorageService
+                                                    .getCanPurchase())
+                                                  Text(
+                                                    ((courseData?.price ?? 0) ==
+                                                            0)
+                                                        ? appText.free
+                                                        : CurrencyUtils
+                                                            .calculator(
                                                                 courseData!
-                                                                    .id!);
+                                                                        .price ??
+                                                                    0),
+                                                    style: style12Regular()
+                                                        .copyWith(
+                                                      color:
+                                                          (courseData!.discountPercent ??
+                                                                      0) >
+                                                                  0
+                                                              ? greyCF
+                                                              : green77(),
+                                                      decoration: (courseData!
+                                                                      .discountPercent ??
+                                                                  0) >
+                                                              0
+                                                          ? TextDecoration
+                                                              .lineThrough
+                                                          : TextDecoration.none,
+                                                      decorationColor:
+                                                          (courseData!.discountPercent ??
+                                                                      0) >
+                                                                  0
+                                                              ? greyCF
+                                                              : green77(),
+                                                    ),
+                                                  ),
+                                                if ((courseData!
+                                                            .discountPercent ??
+                                                        0) >
+                                                    0) ...{
+                                                  space(0, width: 8),
+                                                  if (StorageService
+                                                      .getCanPurchase())
+                                                    Text(
+                                                      CurrencyUtils.calculator(
+                                                          (courseData!.price ??
+                                                                  0) -
+                                                              ((courseData!
+                                                                          .price ??
+                                                                      0) *
+                                                                  (courseData!
+                                                                          .discountPercent ??
+                                                                      0) ~/
+                                                                  100)),
+                                                      style: style14Regular()
+                                                          .copyWith(
+                                                        color: green77(),
+                                                      ),
+                                                    ),
+                                                },
+                                              ],
+                                            ),
+                                            space(16),
+                                            Row(
+                                              children: [
+                                                if (StorageService
+                                                    .getCanPurchase())
+                                                  Expanded(
+                                                      child: button(
+                                                          onTap: () async {
+                                                            if (((courseData
+                                                                        ?.price ??
+                                                                    0) ==
+                                                                0)) {
+                                                              setState(() {
+                                                                isEnrollLoading =
+                                                                    true;
+                                                              });
 
-                                                    if (res) {
-                                                      getData();
-                                                    }
+                                                              bool res = isBundleCourse
+                                                                  ? await PurchaseService
+                                                                      .bundlesFree(
+                                                                          courseData!
+                                                                              .id!)
+                                                                  : await PurchaseService
+                                                                      .courseFree(
+                                                                          courseData!
+                                                                              .id!);
 
-                                                    setState(() {
-                                                      isEnrollLoading = false;
-                                                    });
-                                                  },
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  height: 52,
-                                                  text: appText.enrollOnClass,
-                                                  bgColor: green77(),
-                                                  textColor: Colors.white,
-                                                  isLoading: isEnrollLoading,
-                                                ),
-                                              ),
-                                            } else if (StorageService
-                                                .getCanPurchase()) ...{
-                                              // Show Subscribe Button if course is not free and can be purchased
-                                              Expanded(
-                                                child: button(
-                                                  onTap: () async {
-                                                    setState(() {
-                                                      isSubscribeLoading = true;
-                                                    });
+                                                              if (res) {
+                                                                getData();
+                                                              }
 
-                                                    bool res = await CartService
-                                                        .subscribeApplay(
-                                                            context,
-                                                            courseData!.id!);
+                                                              setState(() {
+                                                                isEnrollLoading =
+                                                                    false;
+                                                              });
 
-                                                    if (res) {
-                                                      getData();
-                                                    }
+                                                              return;
+                                                            }
 
-                                                    setState(() {
-                                                      isSubscribeLoading =
-                                                          false;
-                                                    });
-                                                  },
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  height: 52,
-                                                  text: appText.subscribe,
-                                                  bgColor: Colors.transparent,
-                                                  textColor: green77(),
-                                                  borderColor: green77(),
-                                                  isLoading: isSubscribeLoading,
-                                                  loadingColor: green77(),
-                                                ),
-                                              ),
-                                            } else ...{
-                                              // Show all buttons if can't purchase and course is not free
-                                              button(
+                                                            if (courseData!
+                                                                    .tickets
+                                                                    .isNotEmpty ||
+                                                                (courseData!.points !=
+                                                                        null &&
+                                                                    courseData!
+                                                                            .points !=
+                                                                        0)) {
+                                                              SingleCourseWidget
+                                                                      .pricingPlanDialog(
+                                                                          courseData!)
+                                                                  .then(
+                                                                      (value) {
+                                                                if (value !=
+                                                                        null &&
+                                                                    value) {
+                                                                  courseData =
+                                                                      null;
+                                                                  getData();
+                                                                }
+                                                              });
+                                                              return;
+                                                            } else {
+                                                              setState(() {
+                                                                isEnrollLoading =
+                                                                    true;
+                                                              });
+                                                              await CartService.add(
+                                                                  context,
+                                                                  courseData?.id
+                                                                          ?.toString() ??
+                                                                      '',
+                                                                  isBundleCourse
+                                                                      ? 'bundle'
+                                                                      : 'webinar',
+                                                                  '');
+
+                                                              setState(() {
+                                                                isEnrollLoading =
+                                                                    false;
+                                                                getData();
+                                                              });
+                                                            }
+                                                          },
+                                                          width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width,
+                                                          height: 52,
+                                                          text: appText
+                                                              .enrollOnClass,
+                                                          bgColor: green77(),
+                                                          textColor:
+                                                              Colors.white,
+                                                          isLoading:
+                                                              isEnrollLoading)),
+                                                if (courseData?.subscribe ??
+                                                    false) ...{
+                                                  space(0, width: 16),
+                                                  Expanded(
+                                                      child: button(
+                                                          onTap: () async {
+                                                            setState(() {
+                                                              isSubscribeLoading =
+                                                                  true;
+                                                            });
+
+                                                            bool res = await CartService
+                                                                .subscribeApplay(
+                                                                    context,
+                                                                    courseData!
+                                                                        .id!);
+
+                                                            if (res) {
+                                                              getData();
+                                                            }
+
+                                                            setState(() {
+                                                              isSubscribeLoading =
+                                                                  false;
+                                                              getData();
+                                                            });
+                                                          },
+                                                          width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width,
+                                                          height: 52,
+                                                          text:
+                                                              appText.subscribe,
+                                                          bgColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          textColor: green77(),
+                                                          borderColor:
+                                                              green77(),
+                                                          isLoading:
+                                                              isSubscribeLoading,
+                                                          loadingColor:
+                                                              green77())),
+                                                }
+                                              ],
+                                            )
+                                          } else ...{
+                                            button(
                                                 onTap: () {
                                                   nextRoute(LoginPage.pageName,
                                                       isClearBackRoutes: true);
@@ -745,91 +778,79 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                                 height: 53,
                                                 text: appText.login,
                                                 bgColor: green77(),
-                                                textColor: Colors.white,
+                                                textColor: Colors.white),
+                                          }
+                                        } else ...{
+                                          // progress
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${courseData?.progressPercent ?? 0}% ${appText.completed}',
+                                                style: style10Regular()
+                                                    .copyWith(color: greyA5),
                                               ),
-                                            }
-                                          ],
-                                        )
-                                      } else ...{
-                                        button(
-                                          onTap: () {
-                                            nextRoute(LoginPage.pageName,
-                                                isClearBackRoutes: true);
-                                          },
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          height: 53,
-                                          text: appText.login,
-                                          bgColor: green77(),
-                                          textColor: Colors.white,
-                                        ),
-                                      }
-                                    } else ...{
-                                      // progress
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${courseData?.progressPercent ?? 0}% ${appText.completed}',
-                                            style: style10Regular()
-                                                .copyWith(color: greyA5),
+                                              space(6),
+                                              LayoutBuilder(
+                                                builder:
+                                                    (context, constraints) {
+                                                  return Container(
+                                                    width: constraints.maxWidth,
+                                                    height: 4,
+                                                    alignment:
+                                                        AlignmentDirectional
+                                                            .centerStart,
+                                                    child: Container(
+                                                      width: ((courseData
+                                                                      ?.progressPercent ??
+                                                                  0) >
+                                                              0)
+                                                          ? constraints
+                                                                  .maxWidth *
+                                                              ((courseData?.progressPercent ??
+                                                                      0) /
+                                                                  100)
+                                                          : 5,
+                                                      height: 4,
+                                                      decoration: BoxDecoration(
+                                                        color: green77(),
+                                                        borderRadius:
+                                                            borderRadius(),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                              space(12),
+                                              button(
+                                                  onTap: () {
+                                                    if (courseData?.type ==
+                                                        'bundle') {
+                                                      tabController
+                                                          .animateTo(1);
+                                                    } else {
+                                                      nextRoute(
+                                                          LearningPage.pageName,
+                                                          arguments:
+                                                              courseData);
+                                                    }
+                                                  },
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  height: 52,
+                                                  text:
+                                                      appText.goToLearningPage,
+                                                  bgColor: green77(),
+                                                  textColor: Colors.white,
+                                                  raduis: 15)
+                                            ],
                                           ),
-                                          space(6),
-                                          LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              return Container(
-                                                width: constraints.maxWidth,
-                                                height: 4,
-                                                alignment: AlignmentDirectional
-                                                    .centerStart,
-                                                child: Container(
-                                                  width: ((courseData
-                                                                  ?.progressPercent ??
-                                                              0) >
-                                                          0)
-                                                      ? constraints.maxWidth *
-                                                          ((courseData?.progressPercent ??
-                                                                  0) /
-                                                              100)
-                                                      : 5,
-                                                  height: 4,
-                                                  decoration: BoxDecoration(
-                                                    color: green77(),
-                                                    borderRadius:
-                                                        borderRadius(),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                          space(12),
-                                          button(
-                                            onTap: () {
-                                              if (courseData?.type ==
-                                                  'bundle') {
-                                                tabController.animateTo(1);
-                                              } else {
-                                                nextRoute(LearningPage.pageName,
-                                                    arguments: courseData);
-                                              }
-                                            },
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            height: 52,
-                                            text: appText.goToLearningPage,
-                                            bgColor: green77(),
-                                            textColor: Colors.white,
-                                            raduis: 15,
-                                          ),
-                                        ],
-                                      ),
-                                    }
-                                  ],
-                                ),
-                              ),
-                            ),
+                                        },
+                                      ],
+                                    ))),
+
                             if ((courseData?.authHasBought ?? false)) ...{
                               // write a review
                               AnimatedPositioned(
@@ -870,7 +891,6 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                         textColor: Colors.white),
                                   )),
                             },
-                            FloatingDeviceInfoWidget(),
 
                             AnimatedPositioned(
                                 duration: const Duration(milliseconds: 350),
@@ -909,11 +929,6 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                           }
                         ],
                       )));
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }
 

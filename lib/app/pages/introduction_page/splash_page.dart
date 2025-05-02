@@ -36,7 +36,6 @@ class _SplashPageState extends State<SplashPage>
     animationController =
         AnimationController(vsync: this, duration: const Duration(seconds: 5));
 
-
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       animationController.forward();
 
@@ -161,7 +160,7 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.white,
       body: Container(
         width: getSize().width,
         child: Column(
