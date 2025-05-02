@@ -362,7 +362,7 @@
     "payoutHistory" : "Payout History",
     "salesHistory" : "Sales History",
     "payoutRequest" : "Payout Request",
-    "mayTakeSeconds": "this may take few seconds.",
+    "mayTakeSeconds": "This may take few seconds",
     "financialSettings" : "Financial Settings",
     "classSales" : "Class Sales",
     "meetingSales" : "Meeting Sales",

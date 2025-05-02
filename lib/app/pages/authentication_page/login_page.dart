@@ -394,7 +394,6 @@ class _LoginPageState extends State<LoginPage> {
 
                             SizedBox(height: 18),
                             if (StorageService.getEnableSignup())
-
                             // Forgot Password
                               Align(
                                 child: GestureDetector(

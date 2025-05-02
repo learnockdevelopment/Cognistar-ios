@@ -13,7 +13,7 @@ const Color textPrimaryColor = Color(0xFFD2E0FB); // FOR DARK BACKGROUND
 const Color textSecondaryColor = Color(0xFF001F3F); // FOR LIGHT BACKGROUND
 
 /// Main Color
-Color green77() => const Color(0xffc100ae);
+Color green77() => Color.fromARGB(255, 8, 148, 255);
 Color green91() => const Color(0xff9EFFC1);
 Color blue64() => const Color(0xff1F3B64);
 LinearGradient greenGradint() => LinearGradient(
