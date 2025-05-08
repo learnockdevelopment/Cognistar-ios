@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:http/http.dart' as http;
-import 'package:webinar/app/pages/main_page/home_page/subscription_page/subscription_page%20copy.dart';
+import 'package:webinar/app/pages/main_page/home_page/subscription_page/subscription_page.dart';
 import 'package:webinar/app/widgets/main_widget/support_widget/support_widget.dart';
 import 'package:webinar/common/data/app_data.dart';
 import 'package:webinar/common/utils/constants.dart';

@@ -7,7 +7,7 @@ import 'package:webinar/app/pages/main_page/categories_page/categories_page.dart
 import 'package:webinar/app/pages/main_page/home_page/certificates_page/certificates_page.dart';
 import 'package:webinar/app/pages/main_page/home_page/financial_page/financial_page.dart';
 import 'package:webinar/app/pages/main_page/home_page/setting_page/setting_page.dart';
-import 'package:webinar/app/pages/main_page/home_page/subscription_page/subscription_page%20copy.dart';
+import 'package:webinar/app/pages/main_page/home_page/subscription_page/subscription_page.dart';
 import 'package:webinar/app/providers/app_language_provider.dart';
 import 'package:webinar/app/providers/page_provider.dart';
 import 'package:webinar/app/providers/user_provider.dart';

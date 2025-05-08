@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:webinar/app/models/cart_model.dart';
 import 'package:webinar/app/models/checkout_model.dart';
-import 'package:webinar/app/pages/main_page/home_page/subscription_page/subscription_page%20copy.dart';
+import 'package:webinar/app/pages/main_page/home_page/subscription_page/subscription_page.dart';
 import 'package:webinar/app/pages/main_page/main_page.dart';
 import 'package:webinar/app/providers/user_provider.dart';
 import 'package:webinar/common/components.dart';

@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webinar/app/models/saas_package_model.dart';
 import 'package:webinar/app/pages/main_page/home_page/payment_status_page/payment_status_page.dart';
 import 'package:webinar/app/providers/user_provider.dart';
-import 'package:webinar/app/services/user_service/subscription_service%20copy.dart';
+import 'package:webinar/app/services/user_service/subscription_service.dart';
 import 'package:webinar/app/widgets/main_widget/subscription_widget/subscription_widget.dart';
 import 'package:webinar/common/common.dart';
 import 'package:webinar/common/components.dart';
