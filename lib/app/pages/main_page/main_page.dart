@@ -46,7 +46,7 @@ class _MainPageState extends State<MainPage> {
     HomePage(), // PageNames.home
     CategoriesPage(), // PageNames.categories
     ProvidersPage(), // PageNames.providers
-    BlogsPage(), // PageNames.blog
+    // BlogsPage(), // PageNames.blog
     ClassesPage(), // PageNames.myClasses
   ];
 
@@ -126,8 +126,7 @@ class _MainPageState extends State<MainPage> {
           _selectedIndex = 0;
         }
       },
-      child: Consumer<AppLanguageProvider>(
-          builder: (context, provider, _) {
+      child: Consumer<AppLanguageProvider>(builder: (context, provider, _) {
         // drawerController = AdvancedDrawerController();
         // if (locator<DrawerProvider>().isOpenDrawer) {
         //   drawerController.showDrawer();
@@ -174,8 +173,8 @@ class _MainPageState extends State<MainPage> {
                             GButton(
                                 icon: IconlyLight.user,
                                 text: appText.providers),
-                            GButton(
-                                icon: IconlyLight.activity, text: appText.blog),
+                            // GButton(
+                            //     icon: IconlyLight.activity, text: appText.blog),
                             GButton(
                                 icon: IconlyLight.profile,
                                 text: appText.myClassess),
@@ -223,8 +222,10 @@ class _MainPageState extends State<MainPage> {
                                   setState(() {
                                     setState(() {
                                       _selectedIndex = index;
-                                      pageProvider.pageController.jumpToPage(index);
-                                      pageProvider.setPage(PageNames.values[index]);
+                                      pageProvider.pageController
+                                          .jumpToPage(index);
+                                      pageProvider
+                                          .setPage(PageNames.values[index]);
                                     });
                                   });
                                 },
