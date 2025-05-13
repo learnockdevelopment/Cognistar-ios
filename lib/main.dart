@@ -142,7 +142,7 @@ Future<void> checkRestrictions() async {
 
   if (deviceStatus.values.any((status) => status)) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // showBlockingAlert();
+      showBlockingAlert();
     });
   }
 }

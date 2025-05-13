@@ -627,143 +627,153 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                             space(16),
                                             Row(
                                               children: [
-                                                if (StorageService
-                                                    .getCanPurchase())
+                                                if ((StorageService
+                                                            .getCanPurchase() &&
+                                                        (courseData?.price ??
+                                                                0) ==
+                                                            0) ||
+                                                    (!StorageService
+                                                            .getCanPurchase() &&
+                                                        (courseData?.price ??
+                                                                0) ==
+                                                            0) ||
+                                                    (StorageService
+                                                            .getCanPurchase() &&
+                                                        (courseData?.price ??
+                                                                0) >
+                                                            0))
                                                   Expanded(
-                                                      child: button(
-                                                          onTap: () async {
-                                                            if (((courseData
-                                                                        ?.price ??
-                                                                    0) ==
-                                                                0)) {
-                                                              setState(() {
-                                                                isEnrollLoading =
-                                                                    true;
-                                                              });
+                                                    child: button(
+                                                      onTap: () async {
+                                                        if ((courseData
+                                                                    ?.price ??
+                                                                0) ==
+                                                            0) {
+                                                          setState(() =>
+                                                              isEnrollLoading =
+                                                                  true);
 
-                                                              bool res = isBundleCourse
-                                                                  ? await PurchaseService
-                                                                      .bundlesFree(
-                                                                          courseData!
-                                                                              .id!)
-                                                                  : await PurchaseService
-                                                                      .courseFree(
-                                                                          courseData!
-                                                                              .id!);
+                                                          bool res = isBundleCourse
+                                                              ? await PurchaseService
+                                                                  .bundlesFree(
+                                                                      courseData!
+                                                                          .id!)
+                                                              : await PurchaseService
+                                                                  .courseFree(
+                                                                      courseData!
+                                                                          .id!);
 
-                                                              if (res) {
-                                                                getData();
-                                                              }
+                                                          if (res) getData();
+                                                          setState(() =>
+                                                              isEnrollLoading =
+                                                                  false);
+                                                          return;
+                                                        }
 
-                                                              setState(() {
-                                                                isEnrollLoading =
-                                                                    false;
-                                                              });
-
-                                                              return;
+                                                        if (courseData!.tickets
+                                                                .isNotEmpty ||
+                                                            (courseData!.points !=
+                                                                    null &&
+                                                                courseData!
+                                                                        .points !=
+                                                                    0)) {
+                                                          SingleCourseWidget
+                                                                  .pricingPlanDialog(
+                                                                      courseData!)
+                                                              .then((value) {
+                                                            if (value != null &&
+                                                                value) {
+                                                              courseData = null;
+                                                              getData();
                                                             }
-
-                                                            if (courseData!
-                                                                    .tickets
-                                                                    .isNotEmpty ||
-                                                                (courseData!.points !=
-                                                                        null &&
-                                                                    courseData!
-                                                                            .points !=
-                                                                        0)) {
-                                                              SingleCourseWidget
-                                                                      .pricingPlanDialog(
-                                                                          courseData!)
-                                                                  .then(
-                                                                      (value) {
-                                                                if (value !=
-                                                                        null &&
-                                                                    value) {
-                                                                  courseData =
-                                                                      null;
-                                                                  getData();
-                                                                }
-                                                              });
-                                                              return;
-                                                            } else {
-                                                              setState(() {
-                                                                isEnrollLoading =
-                                                                    true;
-                                                              });
-                                                              await CartService.add(
-                                                                  context,
-                                                                  courseData?.id
-                                                                          ?.toString() ??
-                                                                      '',
-                                                                  isBundleCourse
-                                                                      ? 'bundle'
-                                                                      : 'webinar',
-                                                                  '');
-
-                                                              setState(() {
-                                                                isEnrollLoading =
-                                                                    false;
-                                                                getData();
-                                                              });
-                                                            }
-                                                          },
-                                                          width: MediaQuery.of(
-                                                                  context)
+                                                          });
+                                                          return;
+                                                        } else {
+                                                          setState(() =>
+                                                              isEnrollLoading =
+                                                                  true);
+                                                          await CartService.add(
+                                                            context,
+                                                            courseData?.id
+                                                                    ?.toString() ??
+                                                                '',
+                                                            isBundleCourse
+                                                                ? 'bundle'
+                                                                : 'webinar',
+                                                            '',
+                                                          );
+                                                          setState(() {
+                                                            isEnrollLoading =
+                                                                false;
+                                                            getData();
+                                                          });
+                                                        }
+                                                      },
+                                                      width:
+                                                          MediaQuery.of(context)
                                                               .size
                                                               .width,
-                                                          height: 52,
-                                                          text: appText
-                                                              .enrollOnClass,
-                                                          bgColor: green77(),
-                                                          textColor:
-                                                              Colors.white,
-                                                          isLoading:
-                                                              isEnrollLoading)),
-                                                if (courseData?.subscribe ??
-                                                    false) ...{
+                                                      height: 52,
+                                                      text:
+                                                          appText.enrollOnClass,
+                                                      bgColor: green77(),
+                                                      textColor: Colors.white,
+                                                      isLoading:
+                                                          isEnrollLoading,
+                                                    ),
+                                                  ),
+
+                                                // Show subscribe only if course is paid and user can't purchase
+                                                if ((!StorageService
+                                                            .getCanPurchase() &&
+                                                        (courseData?.price ??
+                                                                0) >
+                                                            0) ||
+                                                    (StorageService.getCanPurchase() &&
+                                                        (courseData?.price ??
+                                                                0) >
+                                                            0 &&
+                                                        (courseData
+                                                                ?.subscribe ??
+                                                            false))) ...[
                                                   space(0, width: 16),
                                                   Expanded(
-                                                      child: button(
-                                                          onTap: () async {
-                                                            setState(() {
-                                                              isSubscribeLoading =
-                                                                  true;
-                                                            });
+                                                    child: button(
+                                                      onTap: () async {
+                                                        setState(() =>
+                                                            isSubscribeLoading =
+                                                                true);
 
-                                                            bool res = await CartService
+                                                        bool res =
+                                                            await CartService
                                                                 .subscribeApplay(
-                                                                    context,
-                                                                    courseData!
-                                                                        .id!);
+                                                          context,
+                                                          courseData!.id!,
+                                                        );
 
-                                                            if (res) {
-                                                              getData();
-                                                            }
-
-                                                            setState(() {
-                                                              isSubscribeLoading =
-                                                                  false;
-                                                              getData();
-                                                            });
-                                                          },
-                                                          width: MediaQuery.of(
-                                                                  context)
+                                                        if (res) getData();
+                                                        setState(() {
+                                                          isSubscribeLoading =
+                                                              false;
+                                                          getData();
+                                                        });
+                                                      },
+                                                      width:
+                                                          MediaQuery.of(context)
                                                               .size
                                                               .width,
-                                                          height: 52,
-                                                          text:
-                                                              appText.subscribe,
-                                                          bgColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          textColor: green77(),
-                                                          borderColor:
-                                                              green77(),
-                                                          isLoading:
-                                                              isSubscribeLoading,
-                                                          loadingColor:
-                                                              green77())),
-                                                }
+                                                      height: 52,
+                                                      text: appText.subscribe,
+                                                      bgColor:
+                                                          Colors.transparent,
+                                                      textColor: green77(),
+                                                      borderColor: green77(),
+                                                      isLoading:
+                                                          isSubscribeLoading,
+                                                      loadingColor: green77(),
+                                                    ),
+                                                  ),
+                                                ],
                                               ],
                                             )
                                           } else ...{
