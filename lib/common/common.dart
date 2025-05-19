@@ -112,31 +112,38 @@ Size getSize(){
 }
 
 
-Widget fadeInImage(String url,double width,double height,){
-  // return FadeInImage.assetNetwork(
-  //   placeholder: AppAssets.placePng, 
-  //   image: url,
-  //   width: width.toDouble(),
-  //   height: height.toDouble(),
-  //   fit: BoxFit.cover,
-  //   imageErrorBuilder: (context, error, stackTrace) {
-
-  //     return Container(
-  //       height: 200,
-  //       color: Colors.grey.shade900,
-  //     );
-  //   },
-  // );
+Widget fadeInImage(String url, double width, double height) {
+  if (url.isEmpty) {
+    return Container(
+      width: width,
+      height: height,
+      color: greyE7,
+      child: Icon(Icons.image_not_supported, color: greyA5, size: 24),
+    );
+  }
 
   return CachedNetworkImage(
     imageUrl: url,
-    placeholder: (context, url) => Image.asset(AppAssets.placePng, width: width.toDouble(), height: height.toDouble(), fit: BoxFit.cover),
-
-    width: width.toDouble(),
-    height: height.toDouble(),
+    width: width,
+    height: height,
     fit: BoxFit.cover,
-
-    errorWidget: (context, url, _) => Image.asset(AppAssets.placePng, width: width.toDouble(), height: height.toDouble(), fit: BoxFit.cover),
+    placeholder: (context, url) => Container(
+      width: width,
+      height: height,
+      color: greyE7,
+      child: Center(
+        child: CupertinoActivityIndicator(
+          color: greyA5,
+          radius: 12,
+        ),
+      ),
+    ),
+    errorWidget: (context, url, error) => Container(
+      width: width,
+      height: height,
+      color: greyE7,
+      child: Icon(Icons.image_not_supported, color: greyA5, size: 24),
+    ),
   );
 }
 

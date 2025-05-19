@@ -13,6 +13,7 @@ import 'package:webinar/common/common.dart';
 import 'package:webinar/common/data/app_data.dart';
 import 'package:webinar/config/assets.dart';
 import 'package:webinar/config/colors.dart';
+import 'package:webinar/config/styles.dart';
 
 class SplashPage extends StatefulWidget {
   static const String pageName = '/splash';
@@ -25,6 +26,13 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
   late AnimationController animationController;
+  late Animation<double> fadeAnimation;
+  late Animation<double> loadingFadeAnimation;
+  late Animation<double> pulseAnimation;
+  late Animation<double> slideAnimation;
+  late Animation<double> scaleAnimation;
+  late Animation<double> logoSlideAnimation;
+  late Animation<double> hideAnimation;
 
   @override
   void initState() {
@@ -33,8 +41,59 @@ class _SplashPageState extends State<SplashPage>
     fetchPurchase();
     fetchSystemSettings();
 
-    animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 5));
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
+
+    fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: Curves.easeIn,
+      ),
+    );
+
+    slideAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    logoSlideAnimation = Tween<double>(begin: 0.0, end: -1.0).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: Curves.easeIn,
+      ),
+    );
+
+    scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    hideAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
+    );
+
+    pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    loadingFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       animationController.forward();
@@ -160,53 +219,88 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        width: getSize().width,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 70),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Center(
-                  child: AnimatedBuilder(
-                    animation: animationController,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: 1 +
-                            (1 *
-                                animationController
-                                    .value), // Smaller pulse range for smoother effect
-                        child: Opacity(
-                          opacity: animationController
-                              .value, // Gradual appearance (step-by-step)
-                          child: Image.asset(
-                            AppAssets.logoPng,
-                            width: 100,
-                            height: 100,
-                          ),
-                        ),
-                      );
-                    },
+      backgroundColor: backgroundColor,
+      body: Stack(
+        children: [
+          // Full screen image with slide animation
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: animationController,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, slideAnimation.value * MediaQuery.of(context).size.height),
+                  child: Transform.scale(
+                    scale: scaleAnimation.value,
+                    child: FadeTransition(
+                      opacity: fadeAnimation,
+                      child: Image.asset(
+                        AppAssets.boyPng,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
-            space(35),
-            const SizedBox(
-              width: 35,
-              child: LoadingIndicator(
-                indicatorType: Indicator.ballBeat,
-                colors: [secondaryColor],
-                strokeWidth: 100,
-                backgroundColor: Colors.transparent,
-                pathBackgroundColor: Colors.transparent,
+          ),
+
+          // Modern gradient overlay
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(0.5),
+                    Colors.black.withOpacity(0.7),
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+          // Loading overlay with modern design
+          Positioned.fill(
+            child: Center(
+              child: FadeTransition(
+                opacity: loadingFadeAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedBuilder(
+                      animation: animationController,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: pulseAnimation.value,
+                          child: Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.white.withOpacity(0.15),
+                                  blurRadius: 30,
+                                  spreadRadius: 10,
+                                ),
+                              ],
+                            ),
+                            child: const CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              strokeWidth: 2.5,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webinar/common/utils/app_text.dart';
 import 'package:webinar/config/colors.dart';
-import '../../services/storage_service.dart.dart';
+import '../../services/storage_service.dart';
 import '../../widgets/main_widget/support_widget/support_widget.dart';
 
 class FloatingActionButtonMenu extends StatelessWidget {

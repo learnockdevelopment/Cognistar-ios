@@ -16,7 +16,6 @@ import 'package:webinar/app/pages/main_page/home_page/meetings_page/meeting_deta
 import 'package:webinar/app/pages/main_page/home_page/payment_status_page/payment_status_page.dart';
 import 'package:webinar/app/pages/main_page/home_page/single_course_page/single_content_page/pdf_viewer_page.dart';
 import 'package:webinar/app/pages/main_page/home_page/single_course_page/single_content_page/web_view_page.dart';
-import 'package:webinar/app/pages/main_page/home_page/subscription_page/subscription_page.dart';
 import 'package:webinar/app/pages/offline_page/internet_connection_page.dart';
 import 'package:webinar/app/pages/offline_page/offline_list_course_page.dart';
 import 'package:webinar/app/pages/offline_page/offline_single_content_page.dart';
@@ -69,11 +68,13 @@ import 'app/pages/main_page/home_page/quizzes_page/quizzes_page.dart';
 import 'app/pages/main_page/providers_page/user_profile_page/user_profile_page.dart';
 import 'app/pages/main_page/home_page/search_page/result_search_page.dart';
 import 'app/pages/main_page/home_page/search_page/suggested_search_page.dart';
+import 'app/pages/main_page/home_page/subscription_page/subscription_page.dart';
 import 'app/providers/app_language_provider.dart';
 import 'app/providers/filter_course_provider.dart';
 import 'app/providers/page_provider.dart';
 import 'app/providers/providers_provider.dart';
 import 'app/providers/user_provider.dart';
+import 'app/providers/CategoryDataManagerProvider.dart';
 import 'common/common.dart';
 import 'locator.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -112,12 +113,12 @@ void main() async {
   //   ////print'token : ${value}');
   // });
   runApp(
-    MyApp(
-      isEmulator: deviceStatus['isEmulator'] ?? false,
-      isRooted: deviceStatus['isRooted'] ?? false,
-      isDeveloper: deviceStatus['isDeveloper'] ?? false,
-    ),
-  );
+       MyApp(
+        isEmulator: deviceStatus['isEmulator'] ?? false,
+        isRooted: deviceStatus['isRooted'] ?? false,
+        isDeveloper: deviceStatus['isDeveloper'] ?? false,
+      ),
+ );
 }
 
 late Map<String, bool> deviceStatus;
@@ -142,7 +143,7 @@ Future<void> checkRestrictions() async {
 
   if (deviceStatus.values.any((status) => status)) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      showBlockingAlert();
+      // showBlockingAlert();
     });
   }
 }
@@ -304,6 +305,7 @@ Future<bool> isDeveloper() async {
   }
 }
 
+
 Future<bool> isEmulator() async {
   final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   try {
@@ -349,6 +351,7 @@ class MyApp extends StatelessWidget {
             create: (context) => locator<ProvidersProvider>()),
         ChangeNotifierProvider(create: (context) => locator<UserProvider>()),
         ChangeNotifierProvider(create: (context) => locator<DrawerProvider>()),
+        ChangeNotifierProvider(create: (_) => CategoryDataManagerProvider()),
       ],
       child: MaterialApp(
         title: appText.webinar,

@@ -1,560 +1,340 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_iconly/flutter_iconly.dart';
-// import 'package:flutter_svg/svg.dart';
-// import 'package:provider/provider.dart';
-// import 'package:webinar/app/pages/main_page/categories_page/filter_category_page/filter_category_page.dart';
-// import 'package:webinar/app/providers/app_language_provider.dart';
-// import 'package:webinar/app/providers/drawer_provider.dart';
-// import 'package:webinar/app/services/guest_service/categories_service.dart';
-// import 'package:webinar/common/common.dart';
-// import 'package:webinar/common/data/app_language.dart';
-// import 'package:webinar/common/shimmer_component.dart';
-// import 'package:webinar/common/utils/app_text.dart';
-// import 'package:webinar/config/assets.dart';
-// import 'package:webinar/config/colors.dart';
-// import 'package:webinar/config/styles.dart';
-// import 'package:webinar/locator.dart';
-//
-// import '../../../../common/utils/object_instance.dart';
-// import '../../../models/category_model.dart';
-// import '../../../../common/components.dart';
-//
-// class CategoriesPage extends StatefulWidget {
-//   const CategoriesPage({super.key});
-//
-//   @override
-//   State<CategoriesPage> createState() => _CategoriesPageState();
-// }
-//
-// class _CategoriesPageState extends State<CategoriesPage> {
-//   bool isLoading = true;
-//   List<CategoryModel> trendCategories = [];
-//   List<CategoryModel> categories = [];
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//
-//     Future.wait([getCategoriesData(), getTrendCategoriessData()]).then((value) {
-//       setState(() {
-//         isLoading = false;
-//       });
-//     });
-//   }
-//
-//   Future getCategoriesData() async {
-//     categories = await CategoriesService.categories();
-//   }
-//
-//   Future getTrendCategoriessData() async {
-//     trendCategories = await CategoriesService.trendCategories();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Consumer<AppLanguageProvider>(
-//         builder: (context, appLanguageProvider, _) {
-//       return directionality(child:
-//           Consumer<DrawerProvider>(builder: (context, drawerProvider, _) {
-//         return ClipRRect(
-//           borderRadius:
-//               borderRadius(radius: drawerProvider.isOpenDrawer ? 20 : 0),
-//           child: Scaffold(
-//             backgroundColor: backgroundColor,
-//             appBar: appbar(
-//               title: appText.categories,
-//               leftIcon: null,
-//               onTapLeftIcon: () {},
-//             ),
-//             body: SingleChildScrollView(
-//               physics: const BouncingScrollPhysics(),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   space(15),
-//
-//                   Padding(
-//                     padding: padding(),
-//                     child: Text(
-//                       appText.trending,
-//                       style: style16Regular(),
-//                     ),
-//                   ),
-//
-//                   space(14),
-//
-//                   // trend categories
-//                   SizedBox(
-//                     width: getSize().width,
-//                     child: SingleChildScrollView(
-//                       scrollDirection: Axis.horizontal,
-//                       physics: const BouncingScrollPhysics(),
-//                       padding: padding(),
-//                       child: Row(
-//                         children: List.generate(
-//                             isLoading ? 3 : trendCategories.length, (index) {
-//                           return isLoading
-//                               ? horizontalCategoryItemShimmer()
-//                               : horizontalCategoryItem(
-//                                   trendCategories[index].color ?? green77(),
-//                                   trendCategories[index].icon ?? '',
-//                                   trendCategories[index].title ?? '',
-//                                   trendCategories[index]
-//                                           .webinarsCount
-//                                           ?.toString() ??
-//                                       '0', () {
-//                                   nextRoute(FilterCategoryPage.pageName,
-//                                       arguments: trendCategories[index]);
-//                                 });
-//                         }),
-//                       ),
-//                     ),
-//                   ),
-//
-//                   space(30),
-//
-//                   Padding(
-//                     padding: padding(),
-//                     child: Text(
-//                       appText.browseCategories,
-//                       style: style16Regular().copyWith(color: grey3A),
-//                     ),
-//                   ),
-//
-//                   space(14),
-//
-//                   // categories
-//                   Container(
-//                     width: getSize().width,
-//                     margin: padding(),
-//                     decoration: BoxDecoration(
-//                       color: Colors.white,
-//                       borderRadius: borderRadius(),
-//                     ),
-//                     child: Column(
-//                       children: [
-//                         ...List.generate(isLoading ? 8 : categories.length,
-//                             (index) {
-//                           return isLoading
-//                               ? categoryItemShimmer()
-//                               : Container(
-//                                   width: getSize().width,
-//                                   padding: padding(),
-//                                   child: Column(
-//                                     children: [
-//                                       space(16),
-//
-//                                       // category
-//                                       GestureDetector(
-//                                         onTap: () {
-//                                           if ((categories[index]
-//                                                   .subCategories
-//                                                   ?.isEmpty ??
-//                                               false)) {
-//                                             nextRoute(
-//                                                 FilterCategoryPage.pageName,
-//                                                 arguments: categories[index]);
-//                                           } else {
-//                                             setState(() {
-//                                               categories[index].isOpen =
-//                                                   !categories[index].isOpen;
-//                                             });
-//                                           }
-//                                         },
-//                                         behavior: HitTestBehavior.opaque,
-//                                         child: Row(
-//                                           children: [
-//                                             if (categories[index].icon !=
-//                                                 null) ...{
-//                                               Container(
-//                                                 width: 34,
-//                                                 height: 34,
-//                                                 decoration: BoxDecoration(
-//                                                   color: greyF8,
-//                                                   shape: BoxShape.circle,
-//                                                 ),
-//                                                 alignment: Alignment.center,
-//                                                 child: Image.network(
-//                                                   categories[index].icon ?? '',
-//                                                   width: 22,
-//                                                 ),
-//                                               ),
-//                                             } else ...{
-//                                               Container(
-//                                                 width: 34,
-//                                                 height: 34,
-//                                                 decoration: BoxDecoration(
-//                                                   color: greyF8,
-//                                                   shape: BoxShape.circle,
-//                                                 ),
-//                                                 alignment: Alignment.center,
-//                                                 child: const Icon(
-//                                                     IconlyLight.image),
-//                                               ),
-//                                             },
-//                                             space(0, width: 10),
-//                                             Column(
-//                                               crossAxisAlignment:
-//                                                   CrossAxisAlignment.start,
-//                                               mainAxisAlignment:
-//                                                   MainAxisAlignment.center,
-//                                               children: [
-//                                                 Text(
-//                                                   categories[index].title ?? '',
-//                                                   style: style14Bold(),
-//                                                 ),
-//                                                 Text(
-//                                                   '${categories[index].webinarsCount} ${appText.courses}',
-//                                                   style: style12Regular()
-//                                                       .copyWith(color: greyA5),
-//                                                 ),
-//                                               ],
-//                                             ),
-//                                             const Spacer(),
-//                                             if (categories[index]
-//                                                     .subCategories
-//                                                     ?.isNotEmpty ??
-//                                                 false) ...{
-//                                               AnimatedRotation(
-//                                                 turns: categories[index].isOpen
-//                                                     ? 90 / 360
-//                                                     : locator<AppLanguage>()
-//                                                             .isRtl()
-//                                                         ? 180 / 360
-//                                                         : 0,
-//                                                 duration: const Duration(
-//                                                     milliseconds: 200),
-//                                                 child: SvgPicture.asset(
-//                                                     AppAssets.arrowRightSvg),
-//                                               )
-//                                             }
-//                                           ],
-//                                         ),
-//                                       ),
-//
-//                                       // subCategories
-//                                       AnimatedCrossFade(
-//                                           firstChild: Stack(
-//                                             children: [
-//                                               // vertical dash
-//                                               PositionedDirectional(
-//                                                 start: 15,
-//                                                 top: 0,
-//                                                 bottom: 35,
-//                                                 child: CustomPaint(
-//                                                   size: const Size(
-//                                                       .5, double.infinity),
-//                                                   painter:
-//                                                       DashedLineVerticalPainter(),
-//                                                   child: const SizedBox(),
-//                                                 ),
-//                                               ),
-//
-//                                               // sub category
-//                                               SizedBox(
-//                                                 child: Column(
-//                                                   children: List.generate(
-//                                                       categories[index]
-//                                                               .subCategories
-//                                                               ?.length ??
-//                                                           0, (i) {
-//                                                     return GestureDetector(
-//                                                       onTap: () {
-//                                                         nextRoute(
-//                                                             FilterCategoryPage
-//                                                                 .pageName,
-//                                                             arguments: categories[
-//                                                                     index]
-//                                                                 .subCategories![i]);
-//                                                       },
-//                                                       behavior: HitTestBehavior
-//                                                           .opaque,
-//                                                       child: Column(
-//                                                         children: [
-//                                                           space(15),
-//
-//                                                           // sub categories item
-//                                                           Padding(
-//                                                             padding: padding(
-//                                                                 horizontal: 10),
-//                                                             child: Row(
-//                                                               children: [
-//                                                                 // circle
-//                                                                 Container(
-//                                                                   width: 10,
-//                                                                   height: 10,
-//                                                                   decoration: BoxDecoration(
-//                                                                       color: Colors
-//                                                                           .white,
-//                                                                       border: Border.all(
-//                                                                           color:
-//                                                                               greyE7,
-//                                                                           width:
-//                                                                               1),
-//                                                                       shape: BoxShape
-//                                                                           .circle),
-//                                                                 ),
-//
-//                                                                 space(0,
-//                                                                     width: 22),
-//
-//                                                                 // sub category details
-//                                                                 Column(
-//                                                                   crossAxisAlignment:
-//                                                                       CrossAxisAlignment
-//                                                                           .start,
-//                                                                   mainAxisAlignment:
-//                                                                       MainAxisAlignment
-//                                                                           .center,
-//                                                                   children: [
-//                                                                     Text(
-//                                                                       categories[index]
-//                                                                               .subCategories?[i]
-//                                                                               .title ??
-//                                                                           '',
-//                                                                       style:
-//                                                                           style14Bold(),
-//                                                                       maxLines:
-//                                                                           1,
-//                                                                     ),
-//                                                                     Text(
-//                                                                       categories[index].subCategories?[i].webinarsCount ==
-//                                                                               0
-//                                                                           ? appText
-//                                                                               .noCourse
-//                                                                           : '${categories[index].subCategories?[i].webinarsCount} ${appText.courses}',
-//                                                                       style: style12Regular().copyWith(
-//                                                                           color:
-//                                                                               greyA5),
-//                                                                     ),
-//                                                                   ],
-//                                                                 ),
-//                                                               ],
-//                                                             ),
-//                                                           ),
-//
-//                                                           space(15),
-//                                                         ],
-//                                                       ),
-//                                                     );
-//                                                   }),
-//                                                 ),
-//                                               )
-//                                             ],
-//                                           ),
-//                                           secondChild: SizedBox(
-//                                             width: getSize().width,
-//                                           ),
-//                                           crossFadeState:
-//                                               categories[index].isOpen
-//                                                   ? CrossFadeState.showFirst
-//                                                   : CrossFadeState.showSecond,
-//                                           duration: const Duration(
-//                                               milliseconds: 300)),
-//
-//                                       space(15),
-//
-//                                       Container(
-//                                         width: getSize().width,
-//                                         height: 1,
-//                                         decoration:
-//                                             BoxDecoration(color: greyF8),
-//                                       )
-//                                     ],
-//                                   ),
-//                                 );
-//                         })
-//                       ],
-//                     ),
-//                   ),
-//
-//                   space(120),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         );
-//       }));
-//     });
-//   }
-// }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
 import 'package:webinar/app/pages/main_page/categories_page/filter_category_page/filter_category_page.dart';
-import 'package:webinar/app/providers/app_language_provider.dart';
-import 'package:webinar/app/providers/drawer_provider.dart';
 import 'package:webinar/app/services/guest_service/categories_service.dart';
 import 'package:webinar/common/common.dart';
-import 'package:webinar/common/data/app_language.dart';
-import 'package:webinar/common/shimmer_component.dart';
 import 'package:webinar/common/utils/app_text.dart';
-import 'package:webinar/config/assets.dart';
 import 'package:webinar/config/colors.dart';
 import 'package:webinar/config/styles.dart';
-import 'package:webinar/locator.dart';
-
-import '../../../../common/utils/object_instance.dart';
-import '../../../models/category_model.dart';
 import '../../../../common/components.dart';
+import '../../../../config/assets.dart';
+import '../../../models/category_model.dart';
+import '../../../widgets/main_widget/main_drawer.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
+  static const String pageName = '/categories';
 
   @override
   State<CategoriesPage> createState() => _CategoriesPageState();
 }
 
-class _CategoriesPageState extends State<CategoriesPage> {
+class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProviderStateMixin {
   bool isLoading = true;
   List<CategoryModel> trendCategories = [];
   List<CategoryModel> categories = [];
+  List<CategoryModel> filteredCategories = [];
+  final TextEditingController _searchController = TextEditingController();
+  bool _isDisposed = false;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-
-    Future.wait([getCategoriesData(), getTrendCategoriessData()]).then((value) {
-      setState(() {
-        isLoading = false;
-      });
-    });
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _loadData();
   }
 
-  Future getCategoriesData() async {
+  Future<void> _loadData() async {
+    if (!mounted || _isDisposed) return;
+
+    try {
+      final results = await Future.wait([
+        getCategoriesData(),
+        getTrendCategoriessData(),
+      ]);
+
+      if (!mounted || _isDisposed) return;
+
+      setState(() {
+        isLoading = false;
+        filteredCategories = categories;
+      });
+    } catch (e) {
+      if (!mounted || _isDisposed) return;
+
+      setState(() {
+        isLoading = false;
+        filteredCategories = categories;
+      });
+    }
+  }
+
+  Future<void> getCategoriesData() async {
+    if (!mounted) return;
     categories = await CategoriesService.categories();
   }
 
-  Future getTrendCategoriessData() async {
+  Future<void> getTrendCategoriessData() async {
+    if (!mounted) return;
     trendCategories = await CategoriesService.trendCategories();
+  }
+
+  void _filterCategories(String query) {
+    if (!mounted || _isDisposed) return;
+
+    setState(() {
+      if (query.isEmpty) {
+        filteredCategories = categories;
+      } else {
+        final searchTerms = query.toLowerCase().split(' ');
+        filteredCategories = categories.where((category) {
+          final title = category.title?.toLowerCase() ?? '';
+
+          // Check if all search terms are found in either title or description
+          return searchTerms.every((term) => title.contains(term)
+          );
+        }).toList();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: MainDrawer(
+        scaffoldKey: _scaffoldKey,
+      ),
+      backgroundColor: backgroundColor,
       appBar: appbar(
-              title: appText.categories,
-              leftIcon: null,
-              onTapLeftIcon: () {},
-            ),
+        title: appText.categories,
+        leftIcon: AppAssets.menuSvg,
+        onTapLeftIcon: () {
+          _scaffoldKey.currentState?.openDrawer();
+        },
+        rightIcon: AppAssets.filterSvg,
+        rightWidth: 22
+      ),
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
-          // Trending Categories
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    blueFE.withOpacity(0.15),
+                    Colors.white,
+                  ],
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(appText.trending,
-                      style: Theme.of(context).textTheme.titleLarge),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: 160,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: isLoading ? 3 : trendCategories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 16),
-                      itemBuilder: (context, index) {
-                        if (isLoading) return const TrendCategoryShimmer();
-                        return TrendCategoryCard(
-                            category: trendCategories[index]);
-                      },
+                  // Modern Search Bar
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        boxShadow(Colors.black.withOpacity(.05), blur: 10, y: 5),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: _filterCategories,
+                      decoration: InputDecoration(
+                        hintText: 'Search categories...',
+                        hintStyle: style14Regular().copyWith(color: greyA5),
+                        prefixIcon: Icon(IconlyLight.search, color: greyA5),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      ),
                     ),
                   ),
+                  if (_searchController.text.isNotEmpty) ...[
+                    space(16),
+                    Text(
+                      'Found ${filteredCategories.length} categories',
+                      style: style14Regular().copyWith(color: greyA5),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
 
-          // All Categories
+          // Add extra spacing between header and cards
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 24),
+          ),
+
           SliverPadding(
-            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 60), // Changed from left: 24
-            sliver: SliverList(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 20, // Increased spacing between cards
+                crossAxisSpacing: 20, // Increased spacing between cards
+                childAspectRatio: 1.1, // Slightly taller cards
+              ),
               delegate: SliverChildBuilderDelegate(
-                    (context, index) {
+                (context, index) {
                   if (isLoading) return const CategoryShimmer();
-                  return CategoryExpansionTile(category: categories[index]);
+                  if (filteredCategories.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: blueFE.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                IconlyLight.search,
+                                size: 48,
+                                color: blueFE,
+                              ),
+                            ),
+                            space(24),
+                            Text(
+                              'No categories found',
+                              style: style16Bold().copyWith(color: grey33),
+                            ),
+                            space(12),
+                            Text(
+                              'Try different keywords',
+                              style: style14Regular().copyWith(color: greyA5),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  final category = filteredCategories[index];
+                  return ModernCategoryCard(category: category);
                 },
-                childCount: isLoading ? 8 : categories.length,
+                childCount: isLoading ? 6 : (filteredCategories.isEmpty ? 1 : filteredCategories.length),
               ),
             ),
           ),
-
         ],
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _searchController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
 }
 
-class TrendCategoryCard extends StatelessWidget {
+class ModernCategoryCard extends StatelessWidget {
   final CategoryModel category;
 
-  const TrendCategoryCard({super.key, required this.category});
+  const ModernCategoryCard({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.2,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        // onTap: () => navigateToFilter(category),
-        onTap: () => {
-          nextRoute(FilterCategoryPage.pageName, arguments: category)
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            image: DecorationImage(
-              image: CachedNetworkImageProvider(category.icon ?? ''),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.3),
-                BlendMode.darken,
-              ),
+    return Hero(
+      tag: 'category_${category.id}',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => nextRoute(FilterCategoryPage.pageName, arguments: category),
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                boxShadow(Colors.black.withOpacity(.08), blur: 15, y: 8),
+              ],
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
+            child: Stack(
               children: [
-                Text(category.title ?? '',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    )),
-                Text(
-                  '${category.webinarsCount} ${appText.courses}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                // Background Pattern
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: CustomPaint(
+                      painter: CategoryPatternPainter(
+                        color: category.color?.withOpacity(0.12) ?? blueFE.withOpacity(0.12),
+                      ),
+                    ),
+                  ),
+                ),
+                // Content
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: category.color?.withOpacity(0.15) ?? blueFE.withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            IconlyLight.category,
+                            color: category.color ?? blueFE,
+                            size: 28,
+                          ),
+                        ),
+                        space(16),
+                        Flexible(
+                          child: Text(
+                            category.title ?? '',
+                            style: style16Bold().copyWith(
+                              color: grey33,
+                              height: 1.3,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        space(16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: category.color?.withOpacity(0.15) ?? blueFE.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'View Details',
+                                style: style12Regular().copyWith(
+                                  color: category.color ?? blueFE,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              space(4),
+                              Icon(
+                                IconlyLight.arrowRight,
+                                size: 14,
+                                color: category.color ?? blueFE,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -566,102 +346,34 @@ class TrendCategoryCard extends StatelessWidget {
   }
 }
 
-class CategoryExpansionTile extends StatelessWidget {
-  final CategoryModel category;
+class CategoryPatternPainter extends CustomPainter {
+  final Color color;
 
-  const CategoryExpansionTile({super.key, required this.category});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          dividerColor: Colors.transparent,
-        ),
-        child: ExpansionTile(
-          leading: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: category.color?.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Icon(IconlyLight.category,
-                  color: category.color ?? Theme.of(context).primaryColor),
-            ),
-          ),
-          title: Text(category.title ?? '',
-              style: Theme.of(context).textTheme.titleMedium),
-          subtitle: Text(
-            '${category.webinarsCount} ${appText.courses}',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          trailing: category.subCategories?.isEmpty ?? true
-              ? null
-              : Icon(
-            category.isOpen
-                ? Icons.expand_less_rounded
-                : Icons.expand_more_rounded,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          onExpansionChanged: (open) {
-            // Handle expansion state
-          },
-          children: [
-            if (category.subCategories?.isNotEmpty ?? false)
-              Padding(
-                padding: const EdgeInsets.only(left: 24, right: 16, bottom: 16),
-                child: Column(
-                  children: category.subCategories!
-                      .map((sub) => ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: category.color,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    title: Text(sub.title ?? '',
-                        style: Theme.of(context).textTheme.bodyMedium),
-                    subtitle: Text(
-                      sub.webinarsCount == 0
-                          ? appText.noCourse
-                          : '${sub.webinarsCount} ${appText.courses}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    onTap: () => {nextRoute(FilterCategoryPage.pageName, arguments: sub)},
-
-                  ))
-                      .toList(),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class TrendCategoryShimmer extends StatelessWidget {
-  const TrendCategoryShimmer({super.key});
+  CategoryPatternPainter({required this.color});
 
   @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.2,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.grey[200],
-        ),
-      ),
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, size.height * 0.7);
+    path.quadraticBezierTo(
+      size.width * 0.5,
+      size.height * 0.5,
+      size.width,
+      size.height * 0.7,
     );
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
   }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
 class CategoryShimmer extends StatelessWidget {
@@ -669,26 +381,46 @@ class CategoryShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: CircleAvatar(backgroundColor: Colors.grey[200]),
-        title: Container(
-          height: 16,
-          width: 100,
-          color: Colors.grey[200],
-        ),
-        subtitle: Container(
-          height: 12,
-          width: 60,
-          color: Colors.grey[200],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          boxShadow(Colors.black.withOpacity(.05), blur: 10, y: 5),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                shape: BoxShape.circle,
+              ),
+            ),
+            space(16),
+            Container(
+              height: 16,
+              width: double.infinity,
+              color: Colors.grey[200],
+            ),
+            space(8),
+            Container(
+              height: 12,
+              width: 80,
+              color: Colors.grey[200],
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
-
 
 class DashedLineVerticalPainter extends CustomPainter {
   @override
@@ -706,3 +438,4 @@ class DashedLineVerticalPainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
+

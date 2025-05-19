@@ -10,6 +10,7 @@ import 'package:webinar/config/assets.dart';
 import 'package:webinar/locator.dart';
 
 import '../../../../../config/colors.dart';
+import '../../../../widgets/main_widget/main_drawer.dart';
 import 'meeting_details_page.dart';
 
 class MeetingsPage extends StatefulWidget {
@@ -51,13 +52,24 @@ class _MeetingsPageState extends State<MeetingsPage> with SingleTickerProviderSt
       isLoading = false;
     });
   }
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return directionality(
-      child: Scaffold(
-        appBar: appbar(title: appText.meetings,background: backgroundColor),
-        backgroundColor: backgroundColor,
+        child: Scaffold(
+          key: _scaffoldKey,
+          drawer: MainDrawer(
+            scaffoldKey: _scaffoldKey,
+          ),
+          appBar: appbar(
+            title: appText.meeting,
+            leftIcon: AppAssets.menuSvg,
+            onTapLeftIcon: () {
+              _scaffoldKey.currentState?.openDrawer();
+            },
+
+          ),        backgroundColor: backgroundColor,
 
         body: isLoading
       ? loading()

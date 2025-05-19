@@ -138,7 +138,7 @@ class _FinancialPageState extends State<FinancialPage>
         child: Scaffold(
           backgroundColor: backgroundColor,
 
-          appBar: appbar(title: appText.financial,background: backgroundColor),
+          appBar: appbar(title: appText.financial),
           body: Column(
             children: [
               tabBar((i) {}, tabController, [

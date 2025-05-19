@@ -6,6 +6,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:webinar/app/pages/authentication_page/register_page.dart';
 import 'package:webinar/app/pages/main_page/main_page.dart';
 import 'package:webinar/app/providers/page_provider.dart';
 import 'package:webinar/app/services/authentication_service/authentication_service.dart';
@@ -201,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(AppAssets.introBgPng),
+                        image: AssetImage(AppAssets.intro1Png),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -394,6 +395,7 @@ class _LoginPageState extends State<LoginPage> {
 
                             SizedBox(height: 18),
                             if (StorageService.getEnableSignup())
+
                             // Forgot Password
                               Align(
                                 child: GestureDetector(
@@ -463,9 +465,35 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ),
-
                             space(35),
-                            if (StorageService.getEnableSignup())
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  appText.dontHaveAnAccount,
+                                  style: style16Regular(),
+                                ),
+                                space(0, width: 2),
+                                GestureDetector(
+                                  onTap: () {
+                                    nextRoute(RegisterPage.pageName); // Replace with your actual page name
+                                  },
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Text(
+                                    appText.signup, // Localized "Login"
+                                    style: style16Regular().copyWith(
+                                      color: Colors
+                                          .blue.shade800, // Highlight login link
+                                      fontWeight:
+                                      FontWeight.bold, // Make the link bold
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            space(35),
+                            // if (StorageService.getEnableSignup())
                               Row(
                                 children: [
                                   Expanded(
@@ -478,8 +506,9 @@ class _LoginPageState extends State<LoginPage> {
                                     padding:
                                     const EdgeInsets.symmetric(horizontal: 8),
                                     child: Text(
-                                      appText.or, // Localized "or"
-                                      style: style16Regular(),
+                                      appText.or,
+                                      style: style16Regular().copyWith(
+                                        color: Colors.white,),
                                     ),
                                   ),
                                   Expanded(
@@ -493,7 +522,7 @@ class _LoginPageState extends State<LoginPage> {
 
                             SizedBox(height: 30),
 
-                            if (StorageService.getEnableSignup())
+                            // if (StorageService.getEnableSignup())
                             // Google Sign-In Button
                               SizedBox(
                                 width: double.infinity,

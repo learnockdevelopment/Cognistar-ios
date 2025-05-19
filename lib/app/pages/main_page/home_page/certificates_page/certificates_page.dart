@@ -93,7 +93,7 @@ class _CertificatesPageState extends State<CertificatesPage> with SingleTickerPr
       child: Scaffold(
         backgroundColor: backgroundColor,
 
-        appBar: appbar(title: appText.certificates,background: backgroundColor),
+        appBar: appbar(title: appText.certificates),
 
         body: Column(
           children: [

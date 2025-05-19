@@ -47,7 +47,7 @@ class MmaintenancePageState extends State<MaintenancePage> {
           height: getSize().height,
           
           decoration: const BoxDecoration(
-            image: DecorationImage(image: AssetImage(AppAssets.introBgPng), fit: BoxFit.cover),
+            image: DecorationImage(image: AssetImage(AppAssets.intro1Png), fit: BoxFit.cover),
           ),
 
           child: Column(

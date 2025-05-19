@@ -172,7 +172,7 @@ class AuthenticationService {
               ],
             ),
           ),
-        );
+        ); 
       },
     );
   }
@@ -291,161 +291,112 @@ class AuthenticationService {
     }
   }
 
-  // static Future<bool> facebook(BuildContext context, String email, String token,
-  //     String name) async {
-  //   try {
-  //     String url = '${Constants.baseUrl}facebook/callback';
-  //     String deviceId = await getDeviceId();
 
-  //     Response res = await httpPost(
-  //       url,
-  //       {
-  //         'id': token,
-  //         'name': name,
-  //         'email': email,
-  //         'device_id': deviceId, // Include Device ID in the body
-  //       },
-  //     );
-
-  //     var jsonResponse = jsonDecode(res.body); // Decode the response body
-
-  //     // Check for a device mismatch error
-  //     if (jsonResponse['success'] == false &&
-  //         jsonResponse['status'] == 'device_mismatch') {
-  //       _showErrorDialog(context, jsonResponse); // Show the error dialog
-  //       return false; // Prevent login
-  //     }
-
-  //     // Check for a successful login
-  //     if (jsonResponse['success']) {
-  //       await AppData.saveAccessToken(jsonResponse['data']['token']);
-  //       return true;
-  //     } else {
-  //       // Handle other errors
-  //       _showErrorDialog(context, jsonResponse); // Show the error dialog
-  //       return false;
-  //     }
-  //   } catch (e) {
-  //     // You might want to log the error or show a different dialog
-  //     _showErrorDialog(context, {'message': 'An unexpected error occurred.'});
-  //     return false;
-  //   }
-  // }
-
-  static Future<Map?> registerWithEmail(
+  static Future<Map?> register(
+      BuildContext context,
       String registerMethod,
+      String name,
       String email,
-      String password,
-      String repeatPassword,
-      String? accountType,
-      List<Fields>? fields) async {
-    try {
-      String url = '${Constants.baseUrl}register/step/1';
-
-      Map body = {
-        "register_method": registerMethod,
-        "country_code": null,
-        'email': email,
-        'password': password,
-        'password_confirmation': repeatPassword,
-      };
-
-      if (fields != null) {
-        Map bodyFields = {};
-        for (var i = 0; i < fields.length; i++) {
-          if (fields[i].type != 'upload') {
-            bodyFields.addEntries({
-              fields[i].id: (fields[i].type == 'toggle')
-                  ? fields[i].userSelectedData == null
-                  ? 0
-                  : 1
-                  : fields[i].userSelectedData
-            }.entries);
-          }
-        }
-
-        body.addEntries({'fields': bodyFields.toString()}.entries);
-      }
-
-      Response res = await httpPost(url, body);
-
-      var jsonResponse = jsonDecode(res.body);
-      if (jsonResponse['success'] ||
-          jsonResponse['status'] == 'go_step_2' ||
-          jsonResponse['status'] == 'go_step_3') {
-        return {
-          'user_id': jsonResponse['data']['user_id'],
-          'step': jsonResponse['status']
-        };
-      } else {
-        ErrorHandler().showError(ErrorEnum.error, jsonResponse);
-        return null;
-      }
-    } catch (e) {
-      return null;
-    }
-  }
-
-  static Future<Map?> registerWithPhone(
-      String registerMethod,
       String countryCode,
       String mobile,
       String password,
       String repeatPassword,
-      String? accountType,
-      List<Fields>? fields) async {
-    // try{
-    String url = '${Constants.baseUrl}register/step/1';
+      String? accountType) async {
+    try {
+      String url = '${Constants.baseUrl}register';
+      log('Starting registration');
+      log('Registration method: $registerMethod');
+      log('Account type: $accountType');
 
-    Map body = {
-      "register_method": registerMethod,
-      "country_code": countryCode,
-      'mobile': mobile,
-      'password': password,
-      'password_confirmation': repeatPassword,
-    };
+      // Show loading dialog
+      _showLoadingDialog(context, appText.mayTakeSeconds);
 
-    if (fields != null) {
-      Map bodyFields = {};
-      for (var i = 0; i < fields.length; i++) {
-        if (fields[i].type != 'upload') {
-          bodyFields.addEntries({
-            fields[i].id: (fields[i].type == 'toggle')
-                ? fields[i].userSelectedData == null
-                ? 0
-                : 1
-                : fields[i].userSelectedData
-          }.entries);
-        }
-      }
-
-      body.addEntries({'fields': bodyFields.toString()}.entries);
-    }
-
-    Response res = await httpPost(url, body);
-
-    ////printres.body);
-
-    var jsonResponse = jsonDecode(res.body);
-    if (jsonResponse['success'] ||
-        jsonResponse['status'] == 'go_step_2' ||
-        jsonResponse['status'] == 'go_step_3') {
-      // || stored
-
-      return {
-        'user_id': jsonResponse['data']['user_id'],
-        'step': jsonResponse['status']
+      Map body = {
+        "register_method": registerMethod,
+        "full_name": name,
+        "email": email,
+        "country_code": countryCode,
+        "mobile": mobile,
+        "password": password,
+        "password_confirmation": repeatPassword,
+        "account_type": accountType ?? "user"
       };
-    } else {
-      ErrorHandler().showError(ErrorEnum.error, jsonResponse);
+
+      log('Sending registration request to: $url');
+      log('Request body: $body');
+
+      Response res = await httpPost(url, body);
+      log('Registration response status: ${res.statusCode}');
+      log('Registration response body: ${res.body}');
+
+      // Close loading dialog
+      if (Navigator.canPop(context)) Navigator.pop(context);
+
+      var jsonResponse = jsonDecode(res.body);
+      if (jsonResponse['success'] == true) {  // Explicitly check for true
+        log('Registration successful');
+        // Don't save token here - wait for verification
+        return {
+          'success': true,
+          'data': jsonResponse['data']
+        };
+      } else {
+        log('Registration failed. Error: ${jsonResponse['message'] ?? 'Unknown error'}');
+        
+        // Handle validation errors
+        if (jsonResponse['status'] == 'validation_error' && jsonResponse['data']?['errors'] != null) {
+          Map<String, dynamic> errors = jsonResponse['data']['errors'];
+          String errorMessage = '';
+          
+          // Build error message from validation errors
+          errors.forEach((field, messages) {
+            if (messages is List && messages.isNotEmpty) {
+              errorMessage += '${messages[0]}\n';
+            }
+          });
+          
+          if (errorMessage.isNotEmpty) {
+            _showErrorDialog(context, {
+              'title': 'Registration Error',
+              'message': errorMessage.trim(),
+            });
+          } else {
+            _showErrorDialog(context, {
+              'title': 'Registration Error',
+              'message': jsonResponse['message'] ?? 'An error occurred during registration.',
+            });
+          }
+        } else if (jsonResponse['status'] == 'email_exists') {
+          _showErrorDialog(context, {
+            'title': 'Email Already Registered',
+            'message': 'This email is already registered. Please use a different email or try logging in.',
+          });
+        } else if (jsonResponse['status'] == 'mobile_exists' || 
+                  (jsonResponse['message']?.toString().contains('users_mobile_unique') ?? false)) {
+          _showErrorDialog(context, {
+            'title': 'Already Registered',
+            'message': 'This phone number is already registered. Please use a different number or try logging in.',
+          });
+        } else {
+          _showErrorDialog(context, {
+            'title': 'Registration Error',
+            'message': jsonResponse['message'] ?? 'An error occurred during registration.',
+          });
+        }
+        return null;
+      }
+    } catch (e) {
+      // Close loading dialog if it's still showing
+      if (Navigator.canPop(context)) Navigator.pop(context);
+      
+      log('Registration error: $e');
+      _showErrorDialog(context, {
+        'title': 'Registration Error',
+        'message': 'An unexpected error occurred. Please try again.',
+      });
       return null;
     }
-
-    // }catch(e){
-    //   return null;
-    // }
   }
-
   static Future<bool> forgetPassword(String email) async {
     try {
       String url = '${Constants.baseUrl}forget-password';
@@ -471,50 +422,41 @@ class AuthenticationService {
   static Future<bool> verifyCode(int userId, String code) async {
     try {
       String url = '${Constants.baseUrl}register/step/2';
+      log('Verifying code for user ID: $userId');
+      log('Verification code: $code');
+      log('Sending verification request to: $url');
 
       Response res = await httpPost(url, {
         "user_id": userId.toString(),
         "code": code,
       });
 
-      // log(res.body.toString());
+      log('Verification response status: ${res.statusCode}');
+      log('Verification response body: ${res.body}');
 
       var jsonResponse = jsonDecode(res.body);
       if (jsonResponse['success']) {
+        log('Verification successful');
+        // Save the token if it exists in the response
+        if (jsonResponse['data']?['token'] != null) {
+          await AppData.saveAccessToken(jsonResponse['data']['token']);
+        }
         return true;
       } else {
+        log('Verification failed. Error: ${jsonResponse['message'] ?? 'Unknown error'}');
+        if (jsonResponse['message']?.contains('invalid code') ?? false) {
+          log('Invalid verification code. Please try again or request a new code');
+        }
         ErrorHandler().showError(ErrorEnum.error, jsonResponse);
         return false;
       }
     } catch (e) {
+      log('Verification error: $e');
       return false;
     }
   }
 
-  static Future<bool> registerStep3(
-      int userId, String name, String referralCode) async {
-    try {
-      String url = '${Constants.baseUrl}register/step/3';
 
-      Response res = await httpPost(url, {
-        "user_id": userId.toString(),
-        "full_name": name,
-        "referral_code": referralCode
-      });
-
-      var jsonResponse = jsonDecode(res.body);
-      if (jsonResponse['success']) {
-        await AppData.saveAccessToken(jsonResponse['data']['token']);
-        await AppData.saveName(name);
-        return true;
-      } else {
-        ErrorHandler().showError(ErrorEnum.error, jsonResponse);
-        return false;
-      }
-    } catch (e) {
-      return false;
-    }
-  }
 
   static Future<String> getDeviceId() async {
     final deviceInfo = DeviceInfoPlugin();

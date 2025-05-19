@@ -45,7 +45,27 @@ class ClassessWidget {
                   // image
                   ClipRRect(
                     borderRadius: borderRadius(radius: 15),
-                    child: fadeInImage(courseData.image ?? '', 130, 85),
+                    child: Container(
+                      width: 130,
+                      height: 85,
+                      child: courseData.image != null && courseData.image!.isNotEmpty
+                          ? Image.network(
+                              courseData.image!,
+                              width: 130,
+                              height: 85,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: greyE7,
+                                  child: Icon(Icons.image_not_supported, color: greyA5, size: 24),
+                                );
+                              },
+                            )
+                          : Container(
+                              color: greyE7,
+                              child: Icon(Icons.image_not_supported, color: greyA5, size: 24),
+                            ),
+                    ),
                   ),
 
                   // details

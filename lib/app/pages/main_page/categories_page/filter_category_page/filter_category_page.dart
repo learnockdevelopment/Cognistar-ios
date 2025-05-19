@@ -46,33 +46,47 @@ class _FilterCategoryPageState extends State<FilterCategoryPage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      // if(ModalRoute.of(context)!.settings.arguments != null){
+      if (!mounted) return;
+      
       category = (ModalRoute.of(context)!.settings.arguments as CategoryModel?);
-
-      getData();
-      getFilters();
-      getFeatured();
-      // }
+      _initializeData();
     });
 
-    scrollController.addListener(() {
-      var min = scrollController.position.pixels;
-      var max = scrollController.position.maxScrollExtent;
-
-      if ((max - min) < 300) {
-        if (!isLoading) {
-          getData();
-        }
-      }
-    });
+    scrollController.addListener(_handleScroll);
   }
 
-  getData() async {
+  void _handleScroll() {
+    if (!mounted) return;
+    
+    var min = scrollController.position.pixels;
+    var max = scrollController.position.maxScrollExtent;
+
+    if ((max - min) < 300) {
+      if (!isLoading) {
+        getData();
+      }
+    }
+  }
+
+  Future<void> _initializeData() async {
+    if (!mounted) return;
+    
+    await Future.wait([
+      getData(),
+      getFilters(),
+      getFeatured(),
+    ]);
+  }
+
+  Future<void> getData() async {
+    if (!mounted) return;
+    
     setState(() {
       isLoading = true;
     });
 
-    data += await CourseService.getAll(
+    try {
+      final newData = await CourseService.getAll(
         offset: data.length,
         cat: category?.id?.toString(),
         filterOption: locator<FilterCourseProvider>().filterSelected,
@@ -82,30 +96,52 @@ class _FilterCategoryPageState extends State<FilterCategoryPage> {
         downloadable: locator<FilterCourseProvider>().downloadable,
         sort: locator<FilterCourseProvider>().sort,
         bundle: locator<FilterCourseProvider>().bundleCourse,
-        reward: locator<FilterCourseProvider>().rewardCourse);
+        reward: locator<FilterCourseProvider>().rewardCourse
+      );
 
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  getFilters() async {
-    if (category != null) {
-      filters = await CategoriesService.getFilters(category!.id!);
-
-      locator<FilterCourseProvider>().filters = filters;
-
-      setState(() {});
+      if (!mounted) return;
+      
+      setState(() {
+        data.addAll(newData);
+        isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      
+      setState(() {
+        isLoading = false;
+      });
+      // Handle error if needed
     }
   }
 
-  getFeatured() {
-    if (category != null) {
-      CourseService.featuredCourse(cat: category!.id!.toString()).then((value) {
-        setState(() {
-          featuredListData = value;
-        });
+  Future<void> getFilters() async {
+    if (!mounted || category == null) return;
+    
+    try {
+      filters = await CategoriesService.getFilters(category!.id!);
+      locator<FilterCourseProvider>().filters = filters;
+
+      if (!mounted) return;
+      setState(() {});
+    } catch (e) {
+      // Handle error if needed
+    }
+  }
+
+  Future<void> getFeatured() async {
+    if (!mounted || category == null) return;
+    
+    try {
+      final featured = await CourseService.featuredCourse(cat: category!.id!.toString());
+      
+      if (!mounted) return;
+      
+      setState(() {
+        featuredListData = featured;
       });
+    } catch (e) {
+      // Handle error if needed
     }
   }
 
@@ -339,6 +375,9 @@ class _FilterCategoryPageState extends State<FilterCategoryPage> {
 
   @override
   void dispose() {
+    scrollController.removeListener(_handleScroll);
+    scrollController.dispose();
+    sliderPageController.dispose();
     locator<FilterCourseProvider>().clearFilter();
     super.dispose();
   }

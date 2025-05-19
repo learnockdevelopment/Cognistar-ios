@@ -15,7 +15,6 @@ import 'package:webinar/common/data/app_language.dart';
 import 'package:webinar/common/utils/app_text.dart';
 import 'package:webinar/common/utils/constants.dart';
 import 'package:webinar/locator.dart';
-import 'package:webinar/app/pages/payment.dart';
 
 import '../../../../models/subscription_model.dart';
 
@@ -27,15 +26,11 @@ class SubscriptionPage extends StatefulWidget {
   State<SubscriptionPage> createState() => _SubscriptionPageState();
 }
 
-class _SubscriptionPageState extends State<SubscriptionPage>
-    with SingleTickerProviderStateMixin {
+class _SubscriptionPageState extends State<SubscriptionPage> with SingleTickerProviderStateMixin{
+
   bool isLoading = false;
   SubscriptionModel? data;
   SaasPackageModel? saasPackageData;
-  List<String> productsIds = [
-    "com.cognistar.app.bronze",
-    "com.cognistar.app.private"
-  ];
 
   PageController pageController = PageController();
   int currentSubscriptionPage = 0;
@@ -44,24 +39,26 @@ class _SubscriptionPageState extends State<SubscriptionPage>
   int currentSaaSPackagePage = 0;
 
   late TabController tabController;
-  late int index = 0; // Assuming you are passing index for the list
 
   bool isLoadingSubscription = false;
   bool isLoadingSaasPackage = false;
 
   late StreamSubscription _sub;
 
+
   @override
   void initState() {
     super.initState();
-    if (locator<UserProvider>().profile?.roleName != 'user') {
+
+    if(locator<UserProvider>().profile?.roleName != 'user'){
       tabController = TabController(length: 2, vsync: this);
-    } else {
+    }else{
       tabController = TabController(length: 1, vsync: this);
     }
 
     getData();
     initUniLinks();
+
   }
 
   getData() async {
@@ -71,26 +68,31 @@ class _SubscriptionPageState extends State<SubscriptionPage>
 
     data = await SubscriptionService.getSubscription();
 
-    if (locator<UserProvider>().profile?.roleName != 'user') {
+    if(locator<UserProvider>().profile?.roleName != 'user'){
       saasPackageData = await SubscriptionService.getSaasPackages();
     }
 
     setState(() {
       isLoading = false;
     });
+
   }
 
   Future<void> initUniLinks() async {
+
     _sub = linkStream.listen((String? link) {
-      if (link != null) {
-        if (link == '${Constants.scheme}://payment-success') {
+      if(link != null){
+
+        if(link == '${Constants.scheme}://payment-success'){
           getData();
           nextRoute(PaymentStatusPage.pageName, arguments: 'success');
-        } else if (link == '${Constants.scheme}://payment-failed') {
+        }else if(link == '${Constants.scheme}://payment-failed'){
           nextRoute(PaymentStatusPage.pageName, arguments: 'failed');
         }
+
       }
     }, onError: (err) {});
+
   }
 
   @override
@@ -103,123 +105,134 @@ class _SubscriptionPageState extends State<SubscriptionPage>
   Widget build(BuildContext context) {
     return directionality(
         child: Scaffold(
+
             appBar: appbar(
-              title: appText.subscription,
-            ),
+                title: appText.subscription),
+
             body: isLoading
                 ? loading()
                 : Column(
-                    children: [
-                      tabBar((p0) => null, tabController, [
-                        Tab(text: appText.subscription, height: 32),
-                        if (locator<UserProvider>().profile?.roleName !=
-                            'user') ...{
-                          Tab(text: appText.saaSPackages, height: 32),
-                        }
-                      ]),
-                      space(6),
-                      Expanded(
-                          child: TabBarView(
-                              controller: tabController,
-                              physics: const BouncingScrollPhysics(),
-                              children: [
-                            SubscriptionWidget.subscriptionPage(
-                                pageController,
-                                data!,
-                                currentSubscriptionPage,
-                                (i) {
-                                  setState(() {
-                                    currentSubscriptionPage = i;
-                                  });
-                                },
-                                isLoadingSubscription,
-                                (int id) async {
-                                  setState(() {
-                                    isLoadingSubscription = true;
-                                  });
+              children: [
 
-                                  String? link = await SubscriptionService
-                                      .getSubscriptionLink(id);
+                tabBar(
+                        (p0) => null,
+                    tabController,
+                    [
+                      Tab(text: appText.subscription, height: 32),
 
-                                  setState(() {
-                                    isLoadingSubscription = false;
-                                  });
+                      if(locator<UserProvider>().profile?.roleName != 'user')...{
+                        Tab(text: appText.saaSPackages, height: 32),
+                      }
 
-                                  if (link != null) {
-                                    String token =
-                                        await AppData.getAccessToken();
+                    ]
+                ),
 
-                                    Map<String, String> headers = {
-                                      "Authorization": "Bearer $token",
-                                      "Content-Type": "application/json",
-                                      'Accept': 'application/json',
-                                      'x-api-key': Constants.apiKey,
-                                      'x-locale': locator<AppLanguage>()
-                                          .currentLanguage
-                                          .toLowerCase(),
-                                    };
+                space(6),
 
-                                    await launchUrlString(link,
-                                        mode: LaunchMode.externalApplication,
-                                        webViewConfiguration:
-                                            WebViewConfiguration(
-                                          headers: headers,
-                                        ));
-                                  }
-                                },
-                                context,
-                                index,
-                                productsIds[currentSubscriptionPage]),
-                            if (locator<UserProvider>().profile?.roleName !=
-                                'user') ...{
-                              SubscriptionWidget.saasPackagePage(
+                Expanded(
+                    child: TabBarView(
+                        controller: tabController,
+                        physics: const BouncingScrollPhysics(),
+                        children: [
+
+                          SubscriptionWidget.subscriptionPage(
+                              pageController,
+                              data!,
+                              currentSubscriptionPage,
+                                  (i) {
+                                setState(() {
+                                  currentSubscriptionPage = i;
+                                });
+                              },
+                              isLoadingSubscription,
+                                  (int id) async {
+                                setState(() {
+                                  isLoadingSubscription = true;
+                                });
+
+                                String? link = await SubscriptionService.getSubscriptionLink(id);
+
+                                setState(() {
+                                  isLoadingSubscription = false;
+                                });
+
+                                if(link != null){
+                                  String token = await AppData.getAccessToken();
+
+                                  Map<String, String> headers = {
+                                    "Authorization": "Bearer $token",
+                                    "Content-Type" : "application/json",
+                                    'Accept' : 'application/json',
+                                    'x-api-key' : Constants.apiKey,
+                                    'x-locale' : locator<AppLanguage>().currentLanguage.toLowerCase(),
+                                  };
+
+                                  await launchUrlString(
+                                      link,
+                                      mode: LaunchMode.externalApplication,
+                                      webViewConfiguration: WebViewConfiguration(
+                                        headers: headers,
+                                      )
+                                  );
+                                }
+                              }
+                          ),
+
+                          if(locator<UserProvider>().profile?.roleName != 'user')...{
+                            SubscriptionWidget.saasPackagePage(
                                 saasPageController,
                                 saasPackageData,
                                 currentSaaSPackagePage,
-                                (i) {
+                                    (i) {
                                   setState(() {
                                     currentSaaSPackagePage = i;
                                   });
                                 },
+
                                 isLoadingSaasPackage,
-                                (int id) async {
+                                    (int id) async {
                                   setState(() {
                                     isLoadingSaasPackage = true;
                                   });
 
-                                  String? link = await SubscriptionService
-                                      .getSaasPackageLink(id);
+                                  String? link = await SubscriptionService.getSaasPackageLink(id);
 
                                   setState(() {
                                     isLoadingSaasPackage = false;
                                   });
 
-                                  if (link != null) {
-                                    String token =
-                                        await AppData.getAccessToken();
+                                  if(link != null){
+                                    String token = await AppData.getAccessToken();
 
                                     Map<String, String> headers = {
                                       "Authorization": "Bearer $token",
-                                      "Content-Type": "application/json",
-                                      'Accept': 'application/json',
-                                      'x-api-key': Constants.apiKey,
-                                      'x-locale': locator<AppLanguage>()
-                                          .currentLanguage
-                                          .toLowerCase(),
+                                      "Content-Type" : "application/json",
+                                      'Accept' : 'application/json',
+                                      'x-api-key' : Constants.apiKey,
+                                      'x-locale' : locator<AppLanguage>().currentLanguage.toLowerCase(),
                                     };
 
-                                    await launchUrlString(link,
+                                    await launchUrlString(
+                                        link,
                                         mode: LaunchMode.externalApplication,
-                                        webViewConfiguration:
-                                            WebViewConfiguration(
+                                        webViewConfiguration: WebViewConfiguration(
                                           headers: headers,
-                                        ));
+                                        )
+                                    );
                                   }
-                                },
-                              ),
-                            }
-                          ])),
-                    ],
-                  )));
+                                }
+
+                            ),
+
+                          }
+
+                        ]
+                    )
+                ),
+
+              ],
+            )
+        )
+    );
   }
 }

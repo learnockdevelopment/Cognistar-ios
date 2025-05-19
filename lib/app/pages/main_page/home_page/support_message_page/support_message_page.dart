@@ -100,7 +100,7 @@ class _SupportMessagePageState extends State<SupportMessagePage> with TickerProv
       child: Scaffold(
         backgroundColor: backgroundColor,
 
-        appBar: appbar(title: appText.support_messages,background: backgroundColor),
+        appBar: appbar(title: appText.support_messages),
 
         body: Column(
           children: [

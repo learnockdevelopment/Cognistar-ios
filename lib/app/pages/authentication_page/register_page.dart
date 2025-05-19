@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 // import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -47,10 +48,14 @@ class _RegisterPageState extends State<RegisterPage> {
   FocusNode passwordNode = FocusNode();
   TextEditingController retypePasswordController = TextEditingController();
   FocusNode retypePasswordNode = FocusNode();
+  TextEditingController nameController = TextEditingController();
+  FocusNode nameNode = FocusNode();
 
   bool isEmptyInputs = true;
   bool isPhoneNumber = true;
   bool isSendingData = false;
+  bool isPasswordVisible = false;
+  bool isRetypePasswordVisible = false;
 
   CountryCode countryCode = CountryCode(
       code: "EGY",
@@ -70,34 +75,32 @@ class _RegisterPageState extends State<RegisterPage> {
   void initState() {
     super.initState();
 
-    if (PublicData.apiConfigData['selectRolesDuringRegistration'] != null) {
-      selectRolesDuringRegistration = ((PublicData
-              .apiConfigData['selectRolesDuringRegistration']) as List<dynamic>)
+    // Initialize selectRolesDuringRegistration with null safety
+    if (PublicData.apiConfigData != null &&
+        PublicData.apiConfigData['selectRolesDuringRegistration'] != null) {
+      selectRolesDuringRegistration = (PublicData
+              .apiConfigData['selectRolesDuringRegistration'] as List<dynamic>)
           .toList();
     }
 
-    // //print the entire apiConfigData to inspect its contents
-    ////print"apiConfigData: ${PublicData.apiConfigData}");
-
-// Check the register method and //print it along with the condition
-    if ((PublicData.apiConfigData?['register_method'] ?? '') == 'email') {
-      isPhoneNumber = false;
-      otherRegisterMethod = 'email';
-    } else {
-      isPhoneNumber = true;
-      otherRegisterMethod = 'phone';
+    // Check the register method and initialize with null safety
+    if (PublicData.apiConfigData != null) {
+      if ((PublicData.apiConfigData['register_method'] ?? '') == 'email') {
+        isPhoneNumber = false;
+        otherRegisterMethod = 'email';
+      } else {
+        isPhoneNumber = true;
+        otherRegisterMethod = 'phone';
+      }
     }
-// //print the determined method and values of isPhoneNumber and otherRegisterMethod
-    ////print"register_method: ${PublicData.apiConfigData?['register_method']}");
-    ////print"isPhoneNumber: $isPhoneNumber");
-    ////print"otherRegisterMethod: $otherRegisterMethod");
 
     mailController.addListener(() {
       if (mounted) {
         if ((mailController.text.trim().isNotEmpty ||
                 phoneController.text.trim().isNotEmpty) &&
             passwordController.text.trim().isNotEmpty &&
-            retypePasswordController.text.trim().isNotEmpty) {
+            retypePasswordController.text.trim().isNotEmpty &&
+            nameController.text.trim().isNotEmpty) {
           if (isEmptyInputs) {
             isEmptyInputs = false;
             setState(() {});
@@ -116,7 +119,8 @@ class _RegisterPageState extends State<RegisterPage> {
         if ((mailController.text.trim().isNotEmpty ||
                 phoneController.text.trim().isNotEmpty) &&
             passwordController.text.trim().isNotEmpty &&
-            retypePasswordController.text.trim().isNotEmpty) {
+            retypePasswordController.text.trim().isNotEmpty &&
+            nameController.text.trim().isNotEmpty) {
           if (isEmptyInputs) {
             isEmptyInputs = false;
             setState(() {});
@@ -135,7 +139,8 @@ class _RegisterPageState extends State<RegisterPage> {
         if ((mailController.text.trim().isNotEmpty ||
                 phoneController.text.trim().isNotEmpty) &&
             passwordController.text.trim().isNotEmpty &&
-            retypePasswordController.text.trim().isNotEmpty) {
+            retypePasswordController.text.trim().isNotEmpty &&
+            nameController.text.trim().isNotEmpty) {
           if (isEmptyInputs) {
             isEmptyInputs = false;
             setState(() {});
@@ -154,7 +159,28 @@ class _RegisterPageState extends State<RegisterPage> {
         if ((mailController.text.trim().isNotEmpty ||
                 phoneController.text.trim().isNotEmpty) &&
             passwordController.text.trim().isNotEmpty &&
-            retypePasswordController.text.trim().isNotEmpty) {
+            retypePasswordController.text.trim().isNotEmpty &&
+            nameController.text.trim().isNotEmpty) {
+          if (isEmptyInputs) {
+            isEmptyInputs = false;
+            setState(() {});
+          }
+        } else {
+          if (!isEmptyInputs) {
+            isEmptyInputs = true;
+            setState(() {});
+          }
+        }
+      }
+    });
+
+    nameController.addListener(() {
+      if (mounted) {
+        if ((mailController.text.trim().isNotEmpty ||
+                phoneController.text.trim().isNotEmpty) &&
+            passwordController.text.trim().isNotEmpty &&
+            retypePasswordController.text.trim().isNotEmpty &&
+            nameController.text.trim().isNotEmpty) {
           if (isEmptyInputs) {
             isEmptyInputs = false;
             setState(() {});
@@ -190,570 +216,530 @@ class _RegisterPageState extends State<RegisterPage> {
     phoneController.dispose();
     passwordController.dispose();
     retypePasswordController.dispose();
+    nameController.dispose();
     mailNode.dispose();
     phoneNode.dispose();
     passwordNode.dispose();
     retypePasswordNode.dispose();
+    nameNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        nextRoute(MainPage.pageName, isClearBackRoutes: true);
-        return false;
-      },
-      child: directionality(
+        onWillPop: () async {
+          nextRoute(MainPage.pageName, isClearBackRoutes: true);
+          return false;
+        },
+        child: directionality(
           child: Scaffold(
-        body: Stack(
-          children: [
-            Positioned.fill(
-                child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: padding(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  space(getSize().height * 0.10),
-
-                  space(10),
-                  Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.start, // Align items to the start
-                    crossAxisAlignment:
-                        CrossAxisAlignment.center, // Center items vertically
-                    children: [
-                      // Back button with adjusted spacing
-                      Transform.translate(
-                        offset: Offset(-10, 4),
-                        child: IconButton(
-                          icon: Icon(Icons.arrow_back, color: Colors.black),
-                          onPressed: () {
-                            nextRoute(MainPage.pageName,
-                                isClearBackRoutes: true);
-                          },
-                        ),
-                      ),
-                      // Adjusting the vertical position of the welcome text
-                      Transform.translate(
-                        offset: Offset(-7, 7),
-                        child: Text(
-                          appText.createAccount,
-                          style: style24Bold(),
-                        ),
-                      ),
-
-                      // Emoji aligned with text
-                      SizedBox(width: 4), // Space between text and emoji
-                      space(0, width: 4),
-                      Transform.translate(
-                        offset: Offset(0, 4), // Move the emoji up by 5 pixels
-                        child: SvgPicture.asset(
-                          AppAssets.signUp, // Your asset path
-                          width: 30, // Adjust width as needed
-                          height: 30, // Adjust height as needed
-                        ),
-                      ),
-                    ],
-                  ),
-                  // title
-                  // desc
-                  Text(
-                    appText.createAccountDesc,
-                    style: style14Regular().copyWith(color: greyA5),
-                  ),
-
-                  space(40),
-                  // facebook
-                  //     if(registerConfig?.showFacebookLoginButton ?? false)...{
-                  //       socialWidget(AppAssets.facebookSvg, () async {
-                  //         try{
-                  //           final LoginResult result = await FacebookAuth.instance.login(permissions: ['email']);
-                  //
-                  //           if (result.status == LoginStatus.success) {
-                  //             final AccessToken accessToken = result.accessToken!;
-                  //
-                  //             setState(() {
-                  //               isSendingData = true;
-                  //             });
-                  //
-                  //             FacebookAuth.instance.getUserData().then((value) async {
-                  //
-                  //               String email = value['email'];
-                  //               String name = value['name'] ?? '';
-                  //
-                  //               try{
-                  //                 bool res = await AuthenticationService.facebook(email, accessToken.tokenString, name);
-                  //
-                  //                 if(res){
-                  //                   nextRoute(MainPage.pageName,isClearBackRoutes: true);
-                  //                 }
-                  //               }catch(_){}
-                  //
-                  //               setState(() {
-                  //                 isSendingData = false;
-                  //               });
-                  //             });
-                  //
-                  //           } else {}
-                  //         }catch(_){}
-                  //       }),
-                  //
-                  //     }
-                  space(10),
-
-                  Text(
-                    appText.accountType,
-                    style: style14Regular().copyWith(color: greyB2),
-                  ),
-
-                  space(1),
-
-                  // account types
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white, borderRadius: borderRadius()),
-                    width: getSize().width,
-                    height: 52,
-                    child: Row(
+              backgroundColor: Colors.blue.shade700,
+              body: Stack(children: [
+                Positioned.fill(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // student
-                        AuthWidget.accountTypeWidget(
-                            appText.student, accountType, PublicData.userRole,
-                            () {
-                          setState(() {
-                            accountType = PublicData.userRole;
-                          });
-                          getAccountTypeFileds();
-                        }),
-
-                        // instructor
-                        if (selectRolesDuringRegistration
-                            .contains(PublicData.teacherRole)) ...{
-                          AuthWidget.accountTypeWidget(appText.instrcutor,
-                              accountType, PublicData.teacherRole, () {
-                            setState(() {
-                              accountType = PublicData.teacherRole;
-                            });
-                            getAccountTypeFileds();
-                          }),
-                        },
-
-                        // organization
-                        if (selectRolesDuringRegistration
-                            .contains(PublicData.organizationRole)) ...{
-                          AuthWidget.accountTypeWidget(appText.organization,
-                              accountType, PublicData.organizationRole, () {
-                            setState(() {
-                              accountType = PublicData.organizationRole;
-                            });
-                            getAccountTypeFileds();
-                          }),
-                        }
-                      ],
-                    ),
-                  ),
-
-                  space(13),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () async {
-                              CountryCode? newData =
-                                  await RegisterWidget.showCountryDialog();
-                              if (newData != null) {
-                                countryCode = newData;
-                                setState(() {});
-                              }
-                            },
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: borderRadius(),
+                        space(getSize().height * 0.08),
+                        Container(
+                          padding: EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: Offset(0, 10),
                               ),
-                              alignment: Alignment.center,
-                              child: ClipRRect(
-                                borderRadius: borderRadius(radius: 50),
-                                child: Image.asset(
-                                  countryCode.flagUri ?? '',
-                                  width: 21,
-                                  height: 19,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
+                            ],
                           ),
-                          space(0, width: 3),
-                          Expanded(
-                              child: input(phoneController, phoneNode,
-                                  appText.phoneNumber)),
-                          if (otherRegisterMethod == "email")
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                appText.optional,
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            blurRadius: 10,
+                                            offset: Offset(0, 5),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Image.asset(
+                                        AppAssets.logoPng,
+                                        width: 64,
+                                        height: 64,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                        ],
-                      ),
-                      space(16),
-                      // Email Field
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: input(
-                              mailController,
-                              mailNode,
-                              appText.yourEmail,
-                              iconPathLeft: AppAssets.mailSvg,
-                              leftIconSize: 14,
-                            ),
-                          ),
-                          if (otherRegisterMethod == "phone")
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                appText.optional,
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              space(24),
+                              input(
+                                nameController,
+                                nameNode,
+                                appText.yourName,
+                                iconPathLeft: AppAssets.profileSvg,
+                                leftIconSize: 18,
+                                isBorder: true,
                               ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  space(16),
-                  input(passwordController, passwordNode, appText.password,
-                      iconPathLeft: AppAssets.passwordSvg,
-                      leftIconSize: 14,
-                      isPassword: true),
+                              space(20),
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      CountryCode? newData =
+                                          await RegisterWidget
+                                              .showCountryDialog();
+                                      if (newData != null) {
+                                        countryCode = newData;
+                                        setState(() {});
+                                      }
+                                    },
+                                    child: Container(
+                                      width: 64,
+                                      height: 56,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(14),
+                                        border: Border.all(
+                                            color: Colors.grey[300]!),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.asset(
+                                          countryCode.flagUri ?? '',
+                                          width: 28,
+                                          height: 28,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  space(0, width: 12),
+                                  Expanded(
+                                    child: input(
+                                      phoneController,
+                                      phoneNode,
+                                      appText.phoneNumber,
+                                      isBorder: true,
+                                      isNumber: true,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              space(20),
+                              input(
+                                mailController,
+                                mailNode,
+                                appText.yourEmail,
+                                iconPathLeft: AppAssets.mailSvg,
+                                leftIconSize: 18,
+                                isBorder: true,
+                              ),
+                              space(20),
+                              input(
+                                passwordController,
+                                passwordNode,
+                                appText.password,
+                                iconPathLeft: AppAssets.passwordSvg,
+                                leftIconSize: 18,
+                                isPassword: true,
+                                isPasswordVisible: isPasswordVisible,
+                                isBorder: true,
+                                togglePasswordVisibility: () {
+                                  setState(() {
+                                    isPasswordVisible = !isPasswordVisible;
+                                  });
+                                },
+                              ),
+                              space(20),
+                              input(
+                                retypePasswordController,
+                                retypePasswordNode,
+                                appText.retypePassword,
+                                iconPathLeft: AppAssets.passwordSvg,
+                                leftIconSize: 18,
+                                isPassword: true,
+                                isPasswordVisible: isRetypePasswordVisible,
+                                isBorder: true,
+                                togglePasswordVisibility: () {
+                                  setState(() {
+                                    isRetypePasswordVisible =
+                                        !isRetypePasswordVisible;
+                                  });
+                                },
+                              ),
+                              space(28),
+                              Container(
+                                width: double.infinity,
+                                height: 58,
+                                child: ElevatedButton.icon(
+                                  onPressed: isEmptyInputs
+                                      ? null
+                                      : () async {
+                                          if (registerConfig
+                                                  ?.formFields?.fields !=
+                                              null) {
+                                            for (var i = 0;
+                                                i <
+                                                    (registerConfig?.formFields
+                                                            ?.fields?.length ??
+                                                        0);
+                                                i++) {
+                                              if (registerConfig
+                                                          ?.formFields
+                                                          ?.fields?[i]
+                                                          .isRequired ==
+                                                      1 &&
+                                                  registerConfig
+                                                          ?.formFields
+                                                          ?.fields?[i]
+                                                          .userSelectedData ==
+                                                      null) {
+                                                if (registerConfig?.formFields
+                                                        ?.fields?[i].type !=
+                                                    'toggle') {
+                                                  showSnackBar(ErrorEnum.alert,
+                                                      '${appText.pleaseReview} ${registerConfig?.formFields?.fields?[i].getTitle()}');
+                                                  return;
+                                                }
+                                              }
+                                            }
+                                          }
 
-                  space(16),
-
-                  input(retypePasswordController, retypePasswordNode,
-                      appText.retypePassword,
-                      iconPathLeft: AppAssets.passwordSvg,
-                      leftIconSize: 14,
-                      isPassword: true),
-
-                  isLoadingAccountType
-                      ? loading()
-                      : Column(
-                          children: [
-                            ...List.generate(
-                                registerConfig?.formFields?.fields?.length ?? 0,
-                                (index) {
-                              return registerConfig?.formFields?.fields?[index]
-                                      .getWidget() ??
-                                  const SizedBox();
-                            })
-                          ],
-                        ),
-
-                  space(32),
-
-                  Center(
-                    child: button(
-                        onTap: () async {
-                          if (!isEmptyInputs) {
-                            if (registerConfig?.formFields?.fields != null) {
-                              for (var i = 0;
-                                  i <
-                                      (registerConfig
-                                              ?.formFields?.fields?.length ??
-                                          0);
-                                  i++) {
-                                if (registerConfig?.formFields?.fields?[i]
-                                            .isRequired ==
-                                        1 &&
-                                    registerConfig?.formFields?.fields?[i]
-                                            .userSelectedData ==
-                                        null) {
-                                  if (registerConfig
-                                          ?.formFields?.fields?[i].type !=
-                                      'toggle') {
-                                    showSnackBar(ErrorEnum.alert,
-                                        '${appText.pleaseReview} ${registerConfig?.formFields?.fields?[i].getTitle()}');
-                                    return;
-                                  }
-                                }
-                              }
-                            }
-
-                            if (passwordController.text.trim().compareTo(
-                                    retypePasswordController.text.trim()) ==
-                                0) {
-                              setState(() {
-                                isSendingData = true;
-                              });
-
-                              if (registerConfig?.registerMethod == 'email') {
-                                Map? res = await AuthenticationService
-                                    .registerWithEmail(
-                                        // email
-                                        registerConfig?.registerMethod ?? '',
-                                        mailController.text.trim(),
-                                        passwordController.text.trim(),
-                                        retypePasswordController.text.trim(),
-                                        accountType,
-                                        registerConfig?.formFields?.fields);
-
-                                if (res != null) {
-                                  if (res['step'] == 'stored' ||
-                                      res['step'] == 'go_step_2') {
-                                    nextRoute(VerifyCodePage.pageName,
-                                        arguments: {
-                                          'user_id': res['user_id'],
-                                          'email': mailController.text.trim(),
-                                          'password':
-                                              passwordController.text.trim(),
-                                          'retypePassword':
-                                              retypePasswordController.text
-                                                  .trim(),
-                                        });
-                                  } else if (res['step'] == 'go_step_3') {
-                                    nextRoute(MainPage.pageName,
-                                        arguments: res['user_id']);
-                                  }
-                                }
-                              } else {
-                                Map? res = await AuthenticationService
-                                    .registerWithPhone(
-                                        // mobile
-                                        registerConfig?.registerMethod ?? '',
-                                        countryCode.dialCode.toString(),
-                                        phoneController.text.trim(),
-                                        passwordController.text.trim(),
-                                        retypePasswordController.text.trim(),
-                                        accountType,
-                                        registerConfig?.formFields?.fields);
-
-                                if (res != null) {
-                                  if (res['step'] == 'stored' ||
-                                      res['step'] == 'go_step_2') {
-                                    nextRoute(VerifyCodePage.pageName,
-                                        arguments: {
-                                          'user_id': res['user_id'],
-                                          'countryCode':
-                                              countryCode.dialCode.toString(),
-                                          'phone': phoneController.text.trim(),
-                                          'password':
-                                              passwordController.text.trim(),
-                                          'retypePassword':
-                                              retypePasswordController.text
+                                          // Phone number validation
+                                          if (phoneController.text
                                                   .trim()
-                                        });
-                                  } else if (res['step'] == 'go_step_3') {
-                                    locator<PageProvider>()
-                                        .setPage(PageNames.home);
-                                    nextRoute(MainPage.pageName,
-                                        arguments: res['user_id']);
-                                  }
-                                }
-                              }
+                                                  .length <
+                                              10) {
+                                            showSnackBar(ErrorEnum.alert,
+                                                'Please enter a valid phone number (minimum 10 digits)');
+                                            return;
+                                          }
 
-                              setState(() {
-                                isSendingData = false;
-                              });
-                            }
-                          }
-                        },
-                        width: getSize().width,
-                        height: 52,
-                        text: appText.createAnAccount,
-                        bgColor: isEmptyInputs ? greyCF : green77(),
-                        textColor: Colors.white,
-                        borderColor: Colors.transparent,
-                        isLoading: isSendingData),
-                  ),
+                                          // Email validation
+                                          bool isValidEmail = RegExp(
+                                                  r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
+                                              .hasMatch(
+                                                  mailController.text.trim());
+                                          if (!isValidEmail) {
+                                            showSnackBar(ErrorEnum.alert,
+                                                'Please enter a valid email address');
+                                            return;
+                                          }
 
-                  space(35),
+                                          // Password validation
+                                          if (passwordController.text
+                                                  .trim()
+                                                  .length <
+                                              8) {
+                                            showSnackBar(ErrorEnum.alert,
+                                                'Password must be at least 8 characters long');
+                                            return;
+                                          }
 
-                  // termsPoliciesDesc
-                  Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        // Here, we're passing the URL directly
-                        nextRoute(
-                          TermsPage.pageName,
-                          arguments:
-                              '${Constants.dommain}/pages/terms', // URL to be passed
-                        );
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: Text(
-                        appText.termsPoliciesDesc,
-                        style: TextStyle(
-                          color: Colors.blue
-                              .shade800, // Highlight login link, // Set link color
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16, // Adjust size as needed
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  space(30),
+                                          // Check for at least one uppercase letter
+                                          if (!passwordController.text
+                                              .trim()
+                                              .contains(RegExp(r'[A-Z]'))) {
+                                            showSnackBar(ErrorEnum.alert,
+                                                'Password must contain at least one uppercase letter');
+                                            return;
+                                          }
 
-                  // haveAnAccount
-                  Column(
-                    children: [
-                      // Existing Account Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            appText
-                                .haveAnAccount, // Localized "Have an account?"
-                            style: style16Regular(),
-                          ),
-                          SizedBox(width: 4), // Small space between text
-                          GestureDetector(
-                            onTap: () {
-                              nextRoute(LoginPage.pageName,
-                                  isClearBackRoutes: true);
-                            },
-                            behavior: HitTestBehavior.opaque,
-                            child: Text(
-                              appText.login, // Localized "Login"
-                              style: style16Regular().copyWith(
-                                color: Colors
-                                    .blue.shade800, // Highlight login link
-                                fontWeight:
-                                    FontWeight.bold, // Make the link bold
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                                          // Check for at least one number
+                                          if (!passwordController.text
+                                              .trim()
+                                              .contains(RegExp(r'[0-9]'))) {
+                                            showSnackBar(ErrorEnum.alert,
+                                                'Password must contain at least one number');
+                                            return;
+                                          }
 
-                      SizedBox(height: 10), // Spacing
+                                          // Password confirmation validation
+                                          if (passwordController.text.trim() !=
+                                              retypePasswordController.text
+                                                  .trim()) {
+                                            showSnackBar(ErrorEnum.alert,
+                                                'Passwords do not match');
+                                            return;
+                                          }
 
-                      // "Or" Divider
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              color: Colors.grey.shade400,
-                              thickness: 1,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              appText.or, // Localized "or"
-                              style: style16Regular(),
-                            ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              color: Colors.grey.shade400,
-                              thickness: 1,
-                            ),
-                          ),
-                        ],
-                      ),
+                                          if (nameController.text
+                                                  .trim()
+                                                  .length <
+                                              3) {
+                                            showSnackBar(ErrorEnum.alert,
+                                                'Please enter a valid name (minimum 3 characters)');
+                                            return;
+                                          }
 
-                      SizedBox(height: 25), // Spacing
+                                          setState(() {
+                                            isSendingData = true;
+                                          });
 
-                      // Google Sign-In Button
-                      SizedBox(
-                        width: double.infinity, // Full-width button
-                        child: GestureDetector(
-                          onTap: () async {
-                            final GoogleSignInAccount? gUser =
-                                await GoogleSignIn().signIn();
-                            final GoogleSignInAuthentication gAuth =
-                                await gUser!.authentication;
+                                          Map? res = await AuthenticationService
+                                              .register(
+                                            context,
+                                            registerConfig?.registerMethod ??
+                                                '',
+                                            nameController.text.trim(),
+                                            mailController.text.trim(),
+                                            countryCode.dialCode.toString(),
+                                            phoneController.text.trim(),
+                                            passwordController.text.trim(),
+                                            retypePasswordController.text
+                                                .trim(),
+                                            accountType,
+                                          );
 
-                            if (gAuth.accessToken != null) {
-                              setState(() {
-                                isSendingData = true;
-                              });
+                                          if (res != null && res['success']) {
+                                            // Always go to verification page first
+                                            nextRoute(
+                                              VerifyCodePage.pageName,
+                                              arguments: {
+                                                'user_id': res['data']
+                                                    ['user_id'],
+                                                'registerMethod': registerConfig
+                                                        ?.registerMethod ??
+                                                    '',
+                                                'name':
+                                                    nameController.text.trim(),
+                                                'email':
+                                                    mailController.text.trim(),
+                                                'phone':
+                                                    phoneController.text.trim(),
+                                                'countryCode': countryCode
+                                                    .dialCode
+                                                    .toString(),
+                                                'password': passwordController
+                                                    .text
+                                                    .trim(),
+                                                'retypePassword':
+                                                    retypePasswordController
+                                                        .text
+                                                        .trim(),
+                                              },
+                                              isClearBackRoutes:
+                                                  true, // Prevent going back to registration
+                                            );
+                                          } else {
+                                            // Show error message if registration fails
+                                            showSnackBar(ErrorEnum.error,
+                                                'Registration failed. Please try again.');
+                                          }
 
-                              try {
-                                bool res = await AuthenticationService.google(
-                                  context,
-                                  gUser.email,
-                                  gAuth.accessToken ?? '',
-                                  gUser.displayName ?? '',
-                                );
-
-                                if (res) {
-                                  await FirebaseMessaging.instance
-                                      .deleteToken();
-                                  nextRoute(MainPage.pageName,
-                                      isClearBackRoutes: true);
-                                }
-                              } catch (_) {}
-
-                              setState(() {
-                                isSendingData = false;
-                              });
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade800, // Google-like color
-                              borderRadius:
-                                  BorderRadius.circular(20), // Rounded corners
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3), // Shadow position
+                                          setState(() {
+                                            isSendingData = false;
+                                          });
+                                        },
+                                  icon: Icon(
+                                    Icons.person_add_rounded,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                  label: isSendingData
+                                      ? SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2.5,
+                                          ),
+                                        )
+                                      : Text(
+                                          appText.createAnAccount,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.3,
+                                          ),
+                                        ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        isEmptyInputs ? greyCF : green77(),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                  ),
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        space(32),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              nextRoute(
+                                TermsPage.pageName,
+                                arguments: '${Constants.dommain}/pages/terms',
+                              );
+                            },
+                            child: Text(
+                              appText.termsPoliciesDesc,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                letterSpacing: 0.2,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            child: Row(
+                          ),
+                        ),
+                        space(32),
+                        Column(
+                          children: [
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SvgPicture.asset(
-                                  AppAssets.googleSvg, // Google icon
-                                  height: 24,
-                                  width: 24,
-                                ),
-                                SizedBox(width: 12),
                                 Text(
-                                  appText.googleSign,
+                                  appText.haveAnAccount,
                                   style: TextStyle(
-                                    color: Colors.white, // White text color
-                                    fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                space(0, width: 6),
+                                GestureDetector(
+                                  onTap: () {
+                                    nextRoute(LoginPage.pageName,
+                                        isClearBackRoutes: true);
+                                  },
+                                  child: Text(
+                                    appText.login,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                      letterSpacing: 0.2,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
+                            space(28),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(
+                                    color: Colors.grey.shade300,
+                                    thickness: 1,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  child: Text(
+                                    appText.or,
+                                    style: style16Regular().copyWith(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey.shade300,
+                                thickness: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                        space(28),
+                        Container(
+                          width: double.infinity,
+                          height: 58,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              final GoogleSignInAccount? gUser =
+                                  await GoogleSignIn().signIn();
+                              final GoogleSignInAuthentication gAuth =
+                                  await gUser!.authentication;
+
+                              if (gAuth.accessToken != null) {
+                                setState(() {
+                                  isSendingData = true;
+                                });
+
+                                try {
+                                  bool res = await AuthenticationService.google(
+                                    context,
+                                    gUser.email,
+                                    gAuth.accessToken ?? '',
+                                    gUser.displayName ?? '',
+                                  );
+
+                                  if (res) {
+                                    await FirebaseMessaging.instance
+                                        .deleteToken();
+                                    nextRoute(MainPage.pageName,
+                                        isClearBackRoutes: true);
+                                  }
+                                } catch (_) {}
+
+                                setState(() {
+                                  isSendingData = false;
+                                });
+                              }
+                            },
+                            icon: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: SvgPicture.asset(
+                                AppAssets.googleSvg,
+                                height: 22,
+                                width: 22,
+                              ),
+                            ),
+                            label: Text(
+                              appText.googleSign,
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(color: Colors.grey.shade300),
+                              ),
+                              elevation: 0,
+                              shadowColor: Colors.transparent,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ))
-          ],
-        ),
-      )),
-    );
+                ),
+              ])),
+        ));
   }
 
   Widget socialWidget(String icon, Function onTap) {

@@ -89,6 +89,65 @@ class CourseService {
     }
   }
 
+  static Future<int> getCourseCount({
+    String? cat,
+    bool upcoming = false,
+    bool free = false,
+    bool discount = false,
+    bool downloadable = false,
+    String? sort,
+    bool reward = false,
+    bool bundle = false,
+    List<int>? filterOption,
+  }) async {
+    try {
+      String url = '${Constants.baseUrl}courses?offset=0&limit=1';
+
+      if (upcoming) url += '&upcoming=1';
+      if (free) url += '&free=1';
+      if (discount) url += '&discount=1';
+      if (downloadable) url += '&downloadable=1';
+      if (reward) url += '&reward=1';
+
+      if (sort != null) url += '&sort=$sort';
+      if (cat != null) url += '&cat=$cat';
+
+      if (filterOption != null && filterOption.isNotEmpty) {
+        for (int i = 0; i < filterOption.length; i++) {
+          url += '&filter_option=${filterOption[i]}';
+        }
+      }
+
+      Response res = await httpGet(url);
+      print('Course count URL: $url');
+      print('Course count response: ${res.body}');
+
+      if (res.statusCode != 200) {
+        print('Course count error: ${res.statusCode}');
+        return 0;
+      }
+
+      var jsonRes = jsonDecode(res.body);
+      if (jsonRes['success'] ?? false) {
+        // The API returns a list of courses, so we need to get the total from the response
+        final data = jsonRes['data'];
+        if (data is List) {
+          return data.length;
+        } else if (data is Map) {
+          // If there's a total field in the response
+          return data['total'] ?? 0;
+        }
+        return 0;
+      } else {
+        print('Course count failed: ${jsonRes['message']}');
+        return 0;
+      }
+    } catch (e) {
+      print('Course count exception: $e');
+      return 0;
+    }
+  }
+
   static Future<SingleCourseModel?> getOverviewCourseData(int id, bool isBundle,
       {bool isPrivate = false}) async {
     try {

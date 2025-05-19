@@ -87,7 +87,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
             children: [
               Positioned.fill(
                 child: Image.asset(
-                  AppAssets.introBgPng,
+                  AppAssets.intro2Png,
                   width: getSize().width,
                   height: getSize().height,
                   fit: BoxFit.cover,

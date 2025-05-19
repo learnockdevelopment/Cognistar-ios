@@ -74,7 +74,7 @@ class _ConversationPageState extends State<ConversationPage> {
       child: Scaffold(
         backgroundColor: backgroundColor,
 
-        appBar: appbar(title: data?.title ?? '',background: backgroundColor),
+        appBar: appbar(title: data?.title ?? ''),
 
         body: isLoading
       ? loading()

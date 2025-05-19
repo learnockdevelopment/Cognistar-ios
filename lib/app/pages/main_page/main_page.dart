@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:webinar/app/pages/main_page/home_page/meetings_page/meetings_page.dart';
 import 'package:webinar/app/pages/main_page/providers_page/providers_page.dart';
 import 'package:webinar/app/providers/drawer_provider.dart';
 import 'package:webinar/app/providers/page_provider.dart';
@@ -44,10 +45,9 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> screens = const [
     HomePage(), // PageNames.home
-    CategoriesPage(), // PageNames.categories
     ProvidersPage(), // PageNames.providers
-    // BlogsPage(), // PageNames.blog
-    ClassesPage(), // PageNames.myClasses
+    BlogsPage(), // PageNames.blog
+    MeetingsPage(), // PageNames.myClasses
   ];
 
   @override
@@ -126,7 +126,8 @@ class _MainPageState extends State<MainPage> {
           _selectedIndex = 0;
         }
       },
-      child: Consumer<AppLanguageProvider>(builder: (context, provider, _) {
+      child: Consumer<AppLanguageProvider>(
+          builder: (context, provider, _) {
         // drawerController = AdvancedDrawerController();
         // if (locator<DrawerProvider>().isOpenDrawer) {
         //   drawerController.showDrawer();
@@ -168,70 +169,56 @@ class _MainPageState extends State<MainPage> {
                           final navbarItems = [
                             GButton(icon: IconlyLight.home, text: appText.home),
                             GButton(
-                                icon: IconlyLight.category,
-                                text: appText.categories),
-                            GButton(
                                 icon: IconlyLight.user,
                                 text: appText.providers),
-                            // GButton(
-                            //     icon: IconlyLight.activity, text: appText.blog),
                             GButton(
-                                icon: IconlyLight.profile,
-                                text: appText.myClassess),
+                                icon: IconlyLight.activity, text: appText.blog),
+                            GButton(
+                                icon: IconlyLight.camera,
+                                text: appText.meeting),
                           ];
                           return Container(
-                            width: double.infinity, // Full width of the screen
-                            // Background color for the navbar
-                            decoration: const BoxDecoration(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(
-                                    24), // Top-left corner radius
-                                topRight: Radius.circular(
-                                    24), // Top-right corner radius
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(24),
+                                topRight: Radius.circular(24),
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, -5),
+                                ),
+                              ],
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 8.0,
-                                  bottom:
-                                      8.0), // Adjust padding only at the top if needed
+                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                               child: GNav(
-                                rippleColor: primaryColor.withOpacity(0.3),
-                                hoverColor: Colors.grey.shade700,
-                                haptic: true, // Haptic feedback
-                                tabBorderRadius: 16,
-                                curve: Curves.easeIn, // Tab animation curves
-                                duration: const Duration(
-                                    milliseconds:
-                                        300), // Tab animation duration
+                                rippleColor: primaryColor.withOpacity(0.2),
+                                hoverColor: primaryColor.withOpacity(0.1),
+                                haptic: true,
+                                tabBorderRadius: 20,
+                                curve: Curves.easeOutExpo,
+                                duration: const Duration(milliseconds: 400),
                                 gap: 8,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                    horizontal:
-                                        12), // Increased vertical padding
-                                color: Colors.grey, // Unselected icon color
-                                activeColor:
-                                    primaryColor, // Selected icon and text color
-                                iconSize: 24, // Tab button icon size
-                                tabBackgroundColor:
-                                    primaryColor.withOpacity(0.1),
+                                color: Colors.grey[600],
+                                activeColor: primaryColor,
+                                iconSize: 24,
+                                tabBackgroundColor: primaryColor.withOpacity(0.15),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                 backgroundColor: Colors.transparent,
                                 tabs: navbarItems,
                                 onTabChange: (index) {
                                   setState(() {
-                                    setState(() {
-                                      _selectedIndex = index;
-                                      pageProvider.pageController
-                                          .jumpToPage(index);
-                                      pageProvider
-                                          .setPage(PageNames.values[index]);
-                                    });
+                                    _selectedIndex = index;
+                                    pageProvider.pageController.jumpToPage(index);
+                                    pageProvider.setPage(PageNames.values[index]);
                                   });
                                 },
                                 selectedIndex: _selectedIndex,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
                               ),
                             ),
                           );
@@ -242,42 +229,6 @@ class _MainPageState extends State<MainPage> {
                 );
               },
             ),
-
-            // AdvancedDrawer(
-            //   key: UniqueKey(),
-            //   backdropColor: Colors.transparent,
-            //   drawer:  const MainDrawer(),
-            //   openRatio: .6,
-            //   openScale: .75,
-            //   animationDuration: const Duration(milliseconds: 150),
-            //   animateChildDecoration: false,
-            //   animationCurve: Curves.linear,
-            //   controller: drawerController,
-            //   childDecoration: BoxDecoration(
-            //     color: Colors.transparent,
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: Colors.black.withOpacity(.12),
-            //         blurRadius: 30,
-            //         offset: const Offset(0, 10),
-            //       )
-            //     ],
-            //   ),
-            //   rtlOpening: locator<AppLanguage>().isRtl(),
-            //   // backdrop: Container(
-            //   //   width: getSize().width,
-            //   //   height: getSize().height,
-            //   //   color: green63,
-            //   //   child: Column(
-            //   //     crossAxisAlignment: CrossAxisAlignment.start,
-            //   //     children: [
-            //   //       space(60),
-            //   //       Image.asset(AppAssets.worldPng, width: getSize().width * .8, fit: BoxFit.cover),
-            //   //     ],
-            //   //   ),
-            //   // ),
-            //   child:
-            // ),
           ),
         );
       }),
@@ -285,247 +236,7 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-// @override
-// Widget build(BuildContext context) {
-//   bottomNavHeight = 110;
-//
-//
-//   if( !kIsWeb ){
-//     if(Platform.isIOS){
-//
-//       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-//         SystemUiOverlay.top
-//       ]);
-//     }
-//   }
-//
-//   return PopScope(
-//     canPop: false,
-//     onPopInvoked: (v){
-//       if(locator<PageProvider>().page == PageNames.home){
-//         MainWidget.showExitDialog();
-//       }else{
-//         locator<PageProvider>().setPage(PageNames.home);
-//       }
-//     },
-//     child: Consumer<AppLanguageProvider>(
-//       builder: (context, languageProvider, _) {
-//
-//         drawerController = AdvancedDrawerController();
-//         if(locator<DrawerProvider>().isOpenDrawer){
-//           drawerController.showDrawer();
-//         }else{
-//           drawerController.hideDrawer();
-//         }
-//
-//         addListener();
-//
-//         return directionality(
-//           child: Scaffold(
-//             resizeToAvoidBottomInset: false,
-//             backgroundColor: green77(),
-//             body: AdvancedDrawer(
-//               key: UniqueKey(),
-//               backdropColor: Colors.transparent,
-//               drawer: const MainDrawer(),
-//               openRatio: .6,
-//               openScale: .75,
-//               animationDuration: const Duration(milliseconds: 150),
-//               animateChildDecoration: false,
-//               animationCurve: Curves.linear,
-//               controller: drawerController,
-//               childDecoration: BoxDecoration(
-//                 // borderRadius: Platform.isIOS ? borderRadius() : const BorderRadius.vertical(top: Radius.circular(21)),
-//                 // borderRadius: kIsWeb ? null : borderRadius(radius: isOpen ? 20 : 0),
-//                 color: Colors.transparent,
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(.12),
-//                     blurRadius: 30,
-//                     offset: const Offset(0, 10)
-//                   )
-//                 ]
-//               ),
-//
-//               rtlOpening: locator<AppLanguage>().isRtl(),
-//               // background
-//               backdrop: Container(
-//                 width: getSize().width,
-//                 height: getSize().height,
-//                 color: green63,
-//                 // decoration: const BoxDecoration(
-//                 //   image: DecorationImage(
-//                 //     image: AssetImage(AppAssets.splashPng),
-//                 //     fit: BoxFit.cover,
-//                 //   )
-//                 // ),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//
-//                     space(60),
-//
-//                     Image.asset(AppAssets.worldPng,width: getSize().width * .8, fit: BoxFit.cover,),
-//                   ],
-//                 ),
-//               ),
-//
-//               child: Consumer<PageProvider>(
-//                 builder: (context, pageProvider, _) {
-//                   return SafeArea(
-//                     bottom: !kIsWeb && Platform.isAndroid,
-//                     top: false,
-//                     child: Scaffold(
-//                       backgroundColor: Colors.transparent,
-//                       resizeToAvoidBottomInset: false,
-//                       extendBody: true,
-//                       body: pageProvider.pages[pageProvider.page],
-//                       bottomNavigationBar: Directionality(
-//                         textDirection: TextDirection.ltr,
-//                         child: Consumer<DrawerProvider>(
-//                           builder: (context, drawerProvider, _) {
-//                             return GNav(
-//                               backgroundColor: Colors.transparent,
-//                               color: Colors.white,
-//                               activeColor: Colors.amber, // Choose the color you want for the active icon
-//                               gap: 8,
-//                               onTabChange: (index) {
-//                                 setState(() {
-//                                   _selectedIndex = index;
-//                                   // Set the page based on selected index
-//                                   switch (index) {
-//                                     case 0:
-//                                       pageProvider.setPage(PageNames.home);
-//                                       break;
-//                                     case 1:
-//                                       pageProvider.setPage(PageNames.categories);
-//                                       break;
-//                                     case 2:
-//                                       pageProvider.setPage(PageNames.providers);
-//                                       break;
-//                                     case 3:
-//                                       pageProvider.setPage(PageNames.blog);
-//                                       break;
-//                                     case 4:
-//                                       pageProvider.setPage(PageNames.myClasses);
-//                                       break;
-//                                   }
-//                                 });
-//                               },
-//                               tabItems: [
-//                                 GButton(
-//                                   icon: Icons.home,
-//                                   text: appText.home,
-//                                 ),
-//                                 GButton(
-//                                   icon: Icons.category,
-//                                   text: appText.categories,
-//                                 ),
-//                                 GButton(
-//                                   icon: Icons.people,
-//                                   text: appText.providers,
-//                                 ),
-//                                 GButton(
-//                                   icon: Icons.library_books,
-//                                   text: appText.blog,
-//                                 ),
-//                                 GButton(
-//                                   icon: Icons.camera_alt_rounded,
-//                                   text: appText.myClassess,
-//                                 ),
-//                               ],
-//                             );
-//
-//                             // return Stack(
-//                             //   children: [
-//                             //
-//                             //     // background
-//                             //     Positioned.fill(
-//                             //       bottom: 0,
-//                             //       top: getSize().height - bottomNavHeight,
-//                             //       child: ClipRRect(
-//                             //         borderRadius: BorderRadius.vertical(
-//                             //           bottom: drawerProvider.isOpenDrawer ? const Radius.circular(kIsWeb ? 0 : 20) : Radius.zero
-//                             //         ),
-//                             //         child: ClipPath(
-//                             //           clipper: BottomNavClipper(),
-//                             //
-//                             //           child: Container(
-//                             //             width: getSize().width,
-//                             //             height: bottomNavHeight,
-//                             //             decoration: BoxDecoration(
-//                             //               gradient: LinearGradient(
-//                             //                 colors: [
-//                             //                   green77(),
-//                             //                   Color(0xff8c30e9)
-//                             //                 ],
-//                             //                 begin: Alignment.topLeft,
-//                             //                 end: Alignment.bottomRight
-//                             //               )
-//                             //             ),
-//                             //           ),
-//                             //
-//                             //
-//                             //         ),
-//                             //       ),
-//                             //     ),
-//                             //
-//                             //     Positioned.fill(
-//                             //       bottom: 0,
-//                             //       top: getSize().height - bottomNavHeight,
-//                             //       child: Row(
-//                             //         mainAxisAlignment: MainAxisAlignment.center,
-//                             //         children: [
-//                             //
-//                             //           MainWidget.navItem(PageNames.categories, pageProvider.page, appText.categories, AppAssets.categorySvg, (){
-//                             //             pageProvider.setPage(PageNames.categories);
-//                             //           }),
-//                             //
-//                             //           MainWidget.navItem(PageNames.providers, pageProvider.page, appText.providers, AppAssets.provideresSvg, (){
-//                             //             pageProvider.setPage(PageNames.providers);
-//                             //           }),
-//                             //
-//                             //
-//                             //           MainWidget.homeNavItem(PageNames.home, pageProvider.page, (){
-//                             //             pageProvider.setPage(PageNames.home);
-//                             //           }),
-//                             //
-//                             //
-//                             //           MainWidget.navItem(PageNames.blog, pageProvider.page, appText.blog, AppAssets.blogSvg, (){
-//                             //             pageProvider.setPage(PageNames.blog);
-//                             //           }),
-//                             //
-//                             //           MainWidget.navItem(PageNames.myClasses, pageProvider.page, appText.myClassess, AppAssets.classesSvg, (){
-//                             //             pageProvider.setPage(PageNames.myClasses);
-//                             //           }),
-//                             //
-//                             //         ],
-//                             //       )
-//                             //     )
-//                             //   ],
-//                             // );
-//                             //
-//                             //
-//
-//                           }
-//                         ),
-//                       ),
-//
-//                     ),
-//                   );
-//                 }
-//               )
-//             ),
-//           )
-//         );
-//       }
-//     ),
-//   );
-// }
-//
-//
-//
-//
+
 
 class BottomNavClipper extends CustomClipper<Path> {
   @override

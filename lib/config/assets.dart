@@ -7,10 +7,14 @@ class AppAssets {
 
   static const String placePng = '${_basePng}place.jpg';
   static const String logoPng = '${_basePng}Logo.png';
-  static const String introBgPng = '${_basePng}intro-bg.png';
   static const String paypalPng = '${_basePng}paypal.png';
   static const String payBgPng = '${_basePng}pay_bg.png';
-
+  static const String boyPng = '${_basePng}splash.png';
+  static const String transLogoPng = '${_basePng}trans-Logo.png';
+  static const String intro1Png = '${_basePng}icon1.png';
+  static const String intro2Png = '${_basePng}icon2.png';
+  static const String intro3Png = '${_basePng}icon3.png';
+  static const String design1 = '${_basePng}design1.png';
 
 
   static const String scannerSvg = '${_baseSvg}qr-code-scan.svg';
@@ -186,18 +190,11 @@ class AppAssets {
   static const String favoriteEmptyStateSvg = '${_baseSvg}favorite_empty_state.svg';
   static const String loginEmptyStateSvg = '${_baseSvg}login_empty_state.svg';
   static const String notFoundEmptyStateSvg = '${_baseSvg}not_found_empty_state.svg';
-  
-
-
-
-
-
-
-
 
   static const String onboarding1Json = '${_baseJson}onboarding1.json';
   static const String onboarding2Json = '${_baseJson}onboarding2.json';
   static const String onboarding3Json = '${_baseJson}onboarding3.json';
   static const String loginJson = '${_baseJson}login.json';
+
 
 }

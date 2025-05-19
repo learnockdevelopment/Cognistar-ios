@@ -94,7 +94,7 @@ class _QuizzesPageState extends State<QuizzesPage>
     return directionality(
         child: Scaffold(
       backgroundColor: backgroundColor,
-      appBar: appbar(title: appText.quizzes, background: backgroundColor),
+      appBar: appbar(title: appText.quizzes),
       body: Column(
         children: [
           space(6),

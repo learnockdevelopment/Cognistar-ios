@@ -75,7 +75,7 @@ class _AssignmentsPageState extends State<AssignmentsPage>
 
     return directionality(
         child: Scaffold(
-      appBar: appbar(title: appText.assignments,background: backgroundColor),
+      appBar: appbar(title: appText.assignments),
       backgroundColor: backgroundColor,
       body: Column(
         children: [

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:webinar/common/data/app_data.dart';
-import '../../../../../../common/utils/constants.dart';
+import 'package:webinar/common/utils/permission_handler.dart';
+import 'package:webinar/common/utils/constants.dart';
 import '../../../../../widgets/floating dev id.dart';
 
 class WebViewPage extends StatefulWidget {
@@ -59,26 +59,25 @@ class _WebViewPageState extends State<WebViewPage> {
         );
 
         cookieManager.setCookie(
-            url: WebUri(url!),
-            name: 'webinar_session',
-            value: token,
-            domain: Constants.dommain.replaceAll('https://', ''),
-            isHttpOnly: true,
-            isSecure: true,
-            path: '/',
-            expiresDate: DateTime.now()
-                .add(const Duration(hours: 2))
-                .millisecondsSinceEpoch,
-            sameSite: HTTPCookieSameSitePolicy.LAX);
+          url: WebUri(url!),
+          name: 'webinar_session',
+          value: token,
+          domain: Constants.dommain.replaceAll('https://', ''),
+          isHttpOnly: true,
+          isSecure: true,
+          path: '/',
+          expiresDate: DateTime.now()
+              .add(const Duration(hours: 2))
+              .millisecondsSinceEpoch,
+          sameSite: HTTPCookieSameSitePolicy.LAX,
+        );
       }
 
       isShow = true;
       setState(() {});
 
-      await [
-        Permission.camera,
-        Permission.microphone,
-      ].request();
+      // Request camera and microphone permissions using the centralized handler
+      await AppPermissionHandler.requestCameraAndMicrophone();
     });
 
     // Set the status bar and navigation bar color here

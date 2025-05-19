@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
 import 'package:webinar/app/models/saas_package_model.dart';
 import 'package:webinar/app/models/subscription_model.dart';
-import 'package:webinar/app/pages/main_page/home_page/payment_status_page/payment_status_page.dart';
-import 'package:webinar/app/pages/payment.dart';
 import 'package:webinar/app/providers/user_provider.dart';
 import 'package:webinar/common/common.dart';
 import 'package:webinar/common/components.dart';
@@ -16,23 +13,16 @@ import 'package:webinar/config/colors.dart';
 import 'package:webinar/config/styles.dart';
 import 'package:webinar/locator.dart';
 
-class SubscriptionWidget {
-  static Widget subscriptionPage(
-      PageController pageController,
-      SubscriptionModel? data,
-      int currentPage,
-      Function(int i) changePage,
-      bool isLoading,
-      Function onTap,
-      BuildContext context,
-      int index, // Assuming index is passed directly
-      String productId) {
-    final IAPService iapService = IAPService();
+class SubscriptionWidget{
+
+  static Widget subscriptionPage(PageController pageController, SubscriptionModel? data, int currentPage,Function(int i) changePage, bool isLoading, Function onTap){
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
           space(16),
 
           // active subscription
@@ -40,110 +30,136 @@ class SubscriptionWidget {
             margin: padding(),
             width: getSize().width,
             padding: padding(horizontal: 10, vertical: 18),
+
             decoration: BoxDecoration(
                 border: Border.all(
                   color: greyE7,
                 ),
-                borderRadius: borderRadius()),
+                borderRadius: borderRadius()
+            ),
+
             child: !(data?.subscribed ?? false)
                 ? Column(
-                    children: [
-                      SvgPicture.asset(AppAssets.subscriptionEmptyStateSvg),
-                      space(16),
-                      Text(
-                        appText.noActiveSubscriptionPlan,
-                        style: style14Regular().copyWith(color: greyA5),
-                      )
-                    ],
-                  )
+              children: [
+
+                SvgPicture.asset(AppAssets.subscriptionEmptyStateSvg),
+
+                space(16),
+
+                Text(
+                  appText.noActiveSubscriptionPlan,
+                  style: style14Regular().copyWith(color: greyA5),
+                )
+              ],
+            )
                 : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      // active plan
-                      Column(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color: green50.withOpacity(.3),
-                                shape: BoxShape.circle),
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset(AppAssets.shieldSvg,
-                                colorFilter:
-                                    ColorFilter.mode(green50, BlendMode.srcIn)),
-                          ),
-                          space(6),
-                          Text(
-                            data?.subscribedTitle ?? '-',
-                            style: style14Bold(),
-                          ),
-                          space(3),
-                          Text(
-                            appText.activePlan,
-                            style: style12Regular().copyWith(color: greyA5),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+
+                // active plan
+                Column(
+                  children: [
+
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: green50.withOpacity(.3),
+                          shape: BoxShape.circle
                       ),
 
-                      // remained downloads
-                      Column(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color: blueFE.withOpacity(.3),
-                                shape: BoxShape.circle),
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset(AppAssets.paperDownloadSvg,
-                                colorFilter:
-                                    ColorFilter.mode(blueFE, BlendMode.srcIn)),
-                          ),
-                          space(6),
-                          Text(
-                            data?.remainedDownloads?.toString() ?? '-',
-                            style: style14Bold(),
-                          ),
-                          space(3),
-                          Text(
-                            appText.remainedDownloads,
-                            style: style12Regular().copyWith(color: greyA5),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(AppAssets.shieldSvg,colorFilter: ColorFilter.mode(green50, BlendMode.srcIn)),
+                    ),
+
+                    space(6),
+
+                    Text(
+                      data?.subscribedTitle ?? '-',
+                      style: style14Bold(),
+                    ),
+
+                    space(3),
+
+                    Text(
+                      appText.activePlan,
+                      style: style12Regular().copyWith(color: greyA5),
+                      textAlign: TextAlign.center,
+                    )
+
+                  ],
+                ),
+
+                // remained downloads
+                Column(
+                  children: [
+
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: blueFE.withOpacity(.3),
+                          shape: BoxShape.circle
                       ),
 
-                      // remained days
-                      Column(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color: yellow29.withOpacity(.3),
-                                shape: BoxShape.circle),
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset(AppAssets.paperDownloadSvg,
-                                colorFilter: ColorFilter.mode(
-                                    yellow29, BlendMode.srcIn)),
-                          ),
-                          space(6),
-                          Text(
-                            data?.daysRemained?.toString() ?? '-',
-                            style: style14Bold(),
-                          ),
-                          space(3),
-                          Text(
-                            appText.remainedDays,
-                            style: style12Regular().copyWith(color: greyA5),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(AppAssets.paperDownloadSvg,colorFilter: ColorFilter.mode(blueFE, BlendMode.srcIn)),
+                    ),
+
+                    space(6),
+
+                    Text(
+                      data?.remainedDownloads?.toString() ?? '-',
+                      style: style14Bold(),
+                    ),
+
+                    space(3),
+
+                    Text(
+                      appText.remainedDownloads,
+                      style: style12Regular().copyWith(color: greyA5),
+                      textAlign: TextAlign.center,
+                    )
+
+                  ],
+                ),
+
+                // remained days
+                Column(
+                  children: [
+
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: yellow29.withOpacity(.3),
+                          shape: BoxShape.circle
                       ),
-                    ],
-                  ),
+
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(AppAssets.paperDownloadSvg,colorFilter: ColorFilter.mode(yellow29, BlendMode.srcIn)),
+                    ),
+
+                    space(6),
+
+                    Text(
+                      data?.daysRemained?.toString() ?? '-',
+                      style: style14Bold(),
+                    ),
+
+                    space(3),
+
+                    Text(
+                      appText.remainedDays,
+                      style: style12Regular().copyWith(color: greyA5),
+                      textAlign: TextAlign.center,
+                    )
+
+                  ],
+                ),
+
+              ],
+            ),
           ),
 
           space(35),
@@ -170,11 +186,16 @@ class SubscriptionWidget {
               clipBehavior: Clip.none,
               physics: const BouncingScrollPhysics(),
               children: [
+
                 ...List.generate(data?.subscribes?.length ?? 0, (index) {
                   return SizedBox(
-                      width: getSize().width,
-                      height: 400,
-                      child: Stack(clipBehavior: Clip.none, children: [
+                    width: getSize().width,
+                    height: 400,
+
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+
                         // bg
                         Positioned(
                             bottom: 0,
@@ -185,204 +206,159 @@ class SubscriptionWidget {
                               height: 380,
                               decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: borderRadius()),
-                            )),
+                                  borderRadius: borderRadius()
+                              ),
+                            )
+                        ),
 
                         // details
                         Positioned(
-                            bottom: 10,
-                            right: 21,
-                            left: 21,
-                            child: Container(
-                              width: getSize().width,
-                              height: 410,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: borderRadius(),
-                                  boxShadow: [
-                                    boxShadow(Colors.black.withOpacity(.03),
-                                        blur: 15, y: 3)
-                                  ]),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  space(30),
+                          bottom: 10,
+                          right: 21,
+                          left: 21,
+                          child: Container(
+                            width: getSize().width,
+                            height: 400,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: borderRadius(),
+                                boxShadow: [boxShadow(Colors.black.withOpacity(.03), blur: 15, y: 3)]
+                            ),
 
-                                  Image.network(
-                                    data?.subscribes?[index].image ?? '',
-                                    width: 90,
-                                    height: 90,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+
+                                space(30),
+
+                                Image.network(
+                                  data?.subscribes?[index].image ?? '',
+                                  width: 90,
+                                  height: 90,
+                                ),
+
+                                space(14),
+
+                                Text(
+                                  data?.subscribes?[index].title ?? '',
+                                  style: style24Bold().copyWith(fontSize: 26),
+                                ),
+
+                                space(5),
+
+                                Text(
+                                  data?.subscribes?[index].description ?? '',
+                                  style: style14Regular().copyWith(color: greyA5),
+                                ),
+
+                                const Spacer(),
+
+                                Text(
+                                  CurrencyUtils.calculator(data?.subscribes?[index].price),
+                                  style: style24Bold().copyWith(fontSize: 26, color: green77()),
+                                ),
+
+                                space(16),
+
+                                // days and classes count
+                                Container(
+                                  constraints: BoxConstraints(
+                                      minWidth: 10,
+                                      maxWidth: getSize().width
                                   ),
 
-                                  space(14),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
 
-                                  Text(
-                                    data?.subscribes?[index].title ?? 'Unknown',
-                                    style: style24Bold().copyWith(fontSize: 26),
-                                  ),
-
-                                  space(5),
-
-                                  Text(
-                                    data?.subscribes?[index].description ??
-                                        'Unknown',
-                                    style: style14Regular()
-                                        .copyWith(color: greyA5),
-                                  ),
-
-                                  const Spacer(),
-
-                                  Text(
-                                    CurrencyUtils.calculator(
-                                        data?.subscribes?[index].price),
-                                    style: style24Bold().copyWith(
-                                        fontSize: 26, color: green77()),
-                                  ),
-
-                                  space(10),
-
-                                  // days and classes count
-                                  Container(
-                                    constraints: BoxConstraints(
-                                        minWidth: 10,
-                                        maxWidth: getSize().width),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 10,
-                                              height: 10,
-                                              decoration: BoxDecoration(
-                                                  border:
-                                                      Border.all(color: greyE7),
-                                                  shape: BoxShape.circle),
-                                            ),
-                                            space(0, width: 4),
-                                            Text(
-                                              '${data?.subscribes?[index].days} ${appText.daysOfSubscription}',
-                                              style: style14Regular()
-                                                  .copyWith(color: greyA5),
-                                            )
-                                          ],
-                                        ),
-                                        space(10),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 10,
-                                              height: 10,
-                                              decoration: BoxDecoration(
-                                                  border:
-                                                      Border.all(color: greyE7),
-                                                  shape: BoxShape.circle),
-                                            ),
-                                            space(0, width: 4),
-                                            Text(
-                                              '${data?.subscribes?[index].usableCount} ${appText.classesSubscription}',
-                                              style: style14Regular()
-                                                  .copyWith(color: greyA5),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  const Spacer(),
-
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16),
-                                    child: Center(
-                                      child: Column(
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          SizedBox(
-                                            width: double
-                                                .infinity, // Ensures the button stretches to full width
-                                            child: ElevatedButton(
-                                              onPressed: () async {
-                                                var susId =
-                                                    data?.subscribes?[index].id;
-                                                var susName =
-                                                    data?.subscribedTitle;
 
-                                                var susState =
-                                                    data?.subscribeId;
-
-                                                await iapService
-                                                    .getSusId(susId);
-
-                                                await iapService.getSusState(
-                                                    susState, susName, context);
-
-                                                await iapService
-                                                    .initialize(productId);
-                                                if (iapService
-                                                    .products.isEmpty) {
-                                                  print(
-                                                      'Product ID: $productId');
-                                                  print('Context: $context');
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return AlertDialog(
-                                                        title: Text(
-                                                            'Product Unavailable'),
-                                                        content: Text(
-                                                            'The product is currently unavailable or waiting for review.'),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                            },
-                                                            child: Text('OK'),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                  return;
-                                                }
-
-                                                await iapService.buyConsumable(
-                                                    productId, context);
-                                                print('Product ID: $productId');
-                                                print('Context: $context');
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical:
-                                                        16), // Uniform button size
-                                                backgroundColor: green77(),
-                                                textStyle:
-                                                    TextStyle(fontSize: 16),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                              ),
-                                              child: Text(appText.purchase),
+                                          Container(
+                                            width: 10,
+                                            height: 10,
+                                            decoration: BoxDecoration(
+                                                border: Border.all(color: greyE7),
+                                                shape: BoxShape.circle
                                             ),
                                           ),
-                                          SizedBox(height: 16),
+
+                                          space(0,width: 4),
+
+                                          Text(
+                                            '${data?.subscribes?[index].days} ${appText.daysOfSubscription}',
+                                            style: style14Regular().copyWith(color: greyA5),
+                                          )
+
                                         ],
                                       ),
+
+                                      space(15),
+
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+
+                                          Container(
+                                            width: 10,
+                                            height: 10,
+                                            decoration: BoxDecoration(
+                                                border: Border.all(color: greyE7),
+                                                shape: BoxShape.circle
+                                            ),
+                                          ),
+
+                                          space(0,width: 4),
+
+                                          Text(
+                                            '${data?.subscribes?[index].usableCount} ${appText.classesSubscription}',
+                                            style: style14Regular().copyWith(color: greyA5),
+                                          )
+
+                                        ],
+                                      ),
+
+                                    ],
+                                  ),
+                                ),
+
+                                const Spacer(),
+
+                                // button
+                                Padding(
+                                  padding: padding(horizontal: 16),
+                                  child: Center(
+                                    child: button(
+                                      onTap: () async {
+
+                                        onTap(data?.subscribes?[index].id);
+
+                                      },
+                                      width: getSize().width,
+                                      height: 50,
+                                      text: appText.purchase,
+                                      bgColor: green77(),
+                                      textColor: Colors.white,
+                                      isLoading: isLoading,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ))
-                      ]));
+                                ),
+
+                                space(16),
+
+                              ],
+                            ),
+
+                          ),
+                        )
+
+                      ],
+                    ),
+                  );
                 })
+
               ],
             ),
           ),
@@ -392,37 +368,40 @@ class SubscriptionWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+
               ...List.generate(data?.subscribes?.length ?? 0, (index) {
                 return AnimatedContainer(
                   margin: padding(horizontal: 1.5),
                   duration: const Duration(milliseconds: 300),
                   width: currentPage == index ? 16 : 7,
                   height: 7,
+
                   decoration: BoxDecoration(
-                      color: green77(), borderRadius: borderRadius()),
+                      color: green77(),
+                      borderRadius: borderRadius()
+                  ),
+
                 );
               }),
+
             ],
           ),
 
           space(70),
+
         ],
       ),
     );
   }
 
-  static Widget saasPackagePage(
-      PageController pageController,
-      SaasPackageModel? data,
-      int currentPage,
-      Function(int i) changePage,
-      bool isLoading,
-      Function onTap) {
+  static Widget saasPackagePage(PageController pageController, SaasPackageModel? data, int currentPage,Function(int i) changePage, bool isLoading, Function onTap){
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
           space(16),
 
           // active subscription
@@ -430,115 +409,136 @@ class SubscriptionWidget {
             margin: padding(),
             width: getSize().width,
             padding: padding(horizontal: 10, vertical: 18),
+
             decoration: BoxDecoration(
                 border: Border.all(
                   color: greyE7,
                 ),
-                borderRadius: borderRadius()),
+                borderRadius: borderRadius()
+            ),
+
             child: (data?.activePackage == null)
                 ? Column(
-                    children: [
-                      SvgPicture.asset(AppAssets.subscriptionEmptyStateSvg),
-                      space(16),
-                      Text(
-                        appText.noContentForShow,
-                        style: style14Regular().copyWith(color: greyA5),
-                      )
-                    ],
-                  )
+              children: [
+
+                SvgPicture.asset(AppAssets.subscriptionEmptyStateSvg),
+
+                space(16),
+
+                Text(
+                  appText.noContentForShow,
+                  style: style14Regular().copyWith(color: greyA5),
+                )
+              ],
+            )
                 : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      // active plan
-                      Column(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color: green50.withOpacity(.3),
-                                shape: BoxShape.circle),
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset(AppAssets.shieldSvg,
-                                colorFilter:
-                                    ColorFilter.mode(green50, BlendMode.srcIn)),
-                          ),
-                          space(6),
-                          Text(
-                            data?.activePackage?.title ?? '-',
-                            style: style14Bold(),
-                          ),
-                          space(3),
-                          Text(
-                            appText.activePlan,
-                            style: style12Regular().copyWith(color: greyA5),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+
+                // active plan
+                Column(
+                  children: [
+
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: green50.withOpacity(.3),
+                          shape: BoxShape.circle
                       ),
 
-                      // remained downloads
-                      Column(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color: blueFE.withOpacity(.3),
-                                shape: BoxShape.circle),
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset(
-                              AppAssets.plusSvg,
-                              colorFilter:
-                                  ColorFilter.mode(blueFE, BlendMode.srcIn),
-                              width: 20,
-                            ),
-                          ),
-                          space(6),
-                          Text(
-                            timeStampToDate(
-                                (data?.activePackage?.activationDate ?? 0) *
-                                    1000),
-                            style: style14Bold(),
-                          ),
-                          space(3),
-                          Text(
-                            appText.activationDate,
-                            style: style12Regular().copyWith(color: greyA5),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(AppAssets.shieldSvg,colorFilter: ColorFilter.mode(green50, BlendMode.srcIn)),
+                    ),
+
+                    space(6),
+
+                    Text(
+                      data?.activePackage?.title ?? '-',
+                      style: style14Bold(),
+                    ),
+
+                    space(3),
+
+                    Text(
+                      appText.activePlan,
+                      style: style12Regular().copyWith(color: greyA5),
+                      textAlign: TextAlign.center,
+                    )
+
+                  ],
+                ),
+
+                // remained downloads
+                Column(
+                  children: [
+
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: blueFE.withOpacity(.3),
+                          shape: BoxShape.circle
                       ),
 
-                      // remained days
-                      Column(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color: yellow29.withOpacity(.3),
-                                shape: BoxShape.circle),
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset(AppAssets.paperDownloadSvg,
-                                colorFilter: ColorFilter.mode(
-                                    yellow29, BlendMode.srcIn)),
-                          ),
-                          space(6),
-                          Text(
-                            data?.activePackage?.daysRemained ?? '-',
-                            style: style14Bold(),
-                          ),
-                          space(3),
-                          Text(
-                            appText.remainedDays,
-                            style: style12Regular().copyWith(color: greyA5),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(AppAssets.plusSvg, colorFilter: ColorFilter.mode(blueFE, BlendMode.srcIn),width: 20,),
+                    ),
+
+                    space(6),
+
+                    Text(
+                      timeStampToDate((data?.activePackage?.activationDate ?? 0) * 1000),
+                      style: style14Bold(),
+                    ),
+
+                    space(3),
+
+                    Text(
+                      appText.activationDate,
+                      style: style12Regular().copyWith(color: greyA5),
+                      textAlign: TextAlign.center,
+                    )
+
+                  ],
+                ),
+
+                // remained days
+                Column(
+                  children: [
+
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: yellow29.withOpacity(.3),
+                          shape: BoxShape.circle
                       ),
-                    ],
-                  ),
+
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(AppAssets.paperDownloadSvg,colorFilter: ColorFilter.mode(yellow29, BlendMode.srcIn)),
+                    ),
+
+                    space(6),
+
+                    Text(
+                      data?.activePackage?.daysRemained ?? '-',
+                      style: style14Bold(),
+                    ),
+
+                    space(3),
+
+                    Text(
+                      appText.remainedDays,
+                      style: style12Regular().copyWith(color: greyA5),
+                      textAlign: TextAlign.center,
+                    )
+
+                  ],
+                ),
+
+              ],
+            ),
           ),
 
           space(20),
@@ -547,6 +547,7 @@ class SubscriptionWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
               // account Statistics
               Padding(
                 padding: padding(),
@@ -557,6 +558,69 @@ class SubscriptionWidget {
               ),
 
               space(16),
+
+              // data
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: padding(),
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+
+                    dashboardInfoBox(
+                        green50,
+                        AppAssets.playCircleSvg,
+                        data?.accountCoursesCount?.toString() ?? '-',
+                        appText.newCourses,
+                            (){}
+                    ),
+
+                    space(0,width: 15),
+
+                    dashboardInfoBox(
+                        red49,
+                        AppAssets.videoSvg,
+                        data?.accountCoursesCapacity?.toString() ?? '-',
+                        appText.liveClassCapacity,
+                            (){}
+                    ),
+
+                    space(0,width: 15),
+
+                    dashboardInfoBox(
+                        blueA4,
+                        AppAssets.timeCircleSvg,
+                        data?.accountMeetingCount?.toString() ?? '-',
+                        appText.meetingTimeSlots,
+                            (){}
+                    ),
+
+                    if(locator<UserProvider>().profile?.roleName == 'organization')...{
+                      space(0,width: 15),
+
+                      dashboardInfoBox(
+                          cyan50,
+                          AppAssets.provideresSvg,
+                          data?.accountStudentsCount?.toString() ?? '-',
+                          appText.students,
+                              (){}
+                      ),
+
+                      space(0,width: 15),
+
+                      dashboardInfoBox(
+                          blue64(),
+                          AppAssets.profileSvg,
+                          data?.accountInstructorsCount?.toString() ?? '-',
+                          appText.instrcutors,
+                              (){}
+                      ),
+                    }
+
+                  ],
+                ),
+              )
+
             ],
           ),
 
@@ -585,13 +649,16 @@ class SubscriptionWidget {
               clipBehavior: Clip.none,
               physics: const BouncingScrollPhysics(),
               children: [
+
                 ...List.generate(data?.packages?.length ?? 0, (index) {
                   return SizedBox(
                     width: getSize().width,
                     height: 520,
+
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
+
                         // bg
                         Positioned(
                             bottom: 0,
@@ -602,8 +669,10 @@ class SubscriptionWidget {
                               height: 500,
                               decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: borderRadius()),
-                            )),
+                                  borderRadius: borderRadius()
+                              ),
+                            )
+                        ),
 
                         // details
                         Positioned(
@@ -616,14 +685,14 @@ class SubscriptionWidget {
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: borderRadius(),
-                                boxShadow: [
-                                  boxShadow(Colors.black.withOpacity(.03),
-                                      blur: 15, y: 3)
-                                ]),
+                                boxShadow: [boxShadow(Colors.black.withOpacity(.03), blur: 15, y: 3)]
+                            ),
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
+
                                 space(30),
 
                                 Image.network(
@@ -643,17 +712,14 @@ class SubscriptionWidget {
 
                                 Text(
                                   data?.packages?[index].description ?? '',
-                                  style:
-                                      style14Regular().copyWith(color: greyA5),
+                                  style: style14Regular().copyWith(color: greyA5),
                                 ),
 
                                 const Spacer(),
 
                                 Text(
-                                  CurrencyUtils.calculator(
-                                      data?.packages?[index].price),
-                                  style: style24Bold()
-                                      .copyWith(fontSize: 26, color: green77()),
+                                  CurrencyUtils.calculator(data?.packages?[index].price),
+                                  style: style24Bold().copyWith(fontSize: 26, color: green77()),
                                 ),
 
                                 space(16),
@@ -661,29 +727,38 @@ class SubscriptionWidget {
                                 // days and classes count
                                 Container(
                                   constraints: BoxConstraints(
-                                      minWidth: 10, maxWidth: getSize().width),
+                                      minWidth: 10,
+                                      maxWidth: getSize().width
+                                  ),
+
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      helper(
-                                          '${data?.packages?[index].days} ${appText.daysOfSubscription}'),
+
+                                      helper('${data?.packages?[index].days} ${appText.daysOfSubscription}'),
+
                                       space(15),
-                                      helper(
-                                          '${data?.packages?[index].coursesCount} ${appText.course}'),
+
+                                      helper('${data?.packages?[index].coursesCount} ${appText.course}'),
+
                                       space(15),
-                                      helper(
-                                          '${data?.packages?[index].coursesCapacity} ${appText.liveClassCapacity}'),
+
+                                      helper('${data?.packages?[index].coursesCapacity} ${appText.liveClassCapacity}'),
+
                                       space(15),
-                                      helper(
-                                          '${data?.packages?[index].meetingCount} ${appText.meetingTimeSlots.replaceAll('\n', ' ')}'),
+
+                                      helper('${data?.packages?[index].meetingCount} ${appText.meetingTimeSlots.replaceAll('\n', ' ')}'),
+
                                       space(15),
-                                      helper(
-                                          '${data?.packages?[index].studentsCount} ${appText.students}'),
+
+                                      helper('${data?.packages?[index].studentsCount} ${appText.students}'),
+
                                       space(15),
-                                      helper(
-                                          '${data?.packages?[index].instructorsCount} ${appText.instrcutors}'),
+
+                                      helper('${data?.packages?[index].instructorsCount} ${appText.instrcutors}'),
+
                                       space(15),
+
                                     ],
                                   ),
                                 ),
@@ -695,7 +770,9 @@ class SubscriptionWidget {
                                   padding: padding(horizontal: 16),
                                   child: button(
                                     onTap: () async {
+
                                       onTap(data?.packages?[index].id);
+
                                     },
                                     width: getSize().width,
                                     height: 50,
@@ -707,14 +784,18 @@ class SubscriptionWidget {
                                 ),
 
                                 space(16),
+
                               ],
                             ),
+
                           ),
                         )
+
                       ],
                     ),
                   );
                 })
+
               ],
             ),
           ),
@@ -725,40 +806,57 @@ class SubscriptionWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+
               ...List.generate(data?.packages?.length ?? 0, (index) {
                 return AnimatedContainer(
                   margin: padding(horizontal: 1.5),
                   duration: const Duration(milliseconds: 300),
                   width: currentPage == index ? 16 : 7,
                   height: 7,
+
                   decoration: BoxDecoration(
-                      color: green77(), borderRadius: borderRadius()),
+                      color: green77(),
+                      borderRadius: borderRadius()
+                  ),
+
                 );
               }),
+
             ],
           ),
 
           space(70),
+
         ],
       ),
     );
   }
 
-  static Widget helper(String title) {
+
+
+
+
+  static Widget helper(String title){
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+
         Container(
           width: 10,
           height: 10,
           decoration: BoxDecoration(
-              border: Border.all(color: greyE7), shape: BoxShape.circle),
+              border: Border.all(color: greyE7),
+              shape: BoxShape.circle
+          ),
         ),
-        space(0, width: 4),
+
+        space(0,width: 4),
+
         Text(
           title,
           style: style14Regular().copyWith(color: greyA5),
         )
+
       ],
     );
   }

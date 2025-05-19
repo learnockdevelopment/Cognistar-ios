@@ -42,7 +42,10 @@ Widget courseItemVerticallyShimmer() {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        shimmerUi(height: 8, width: getSize().width * .35),
+                        Expanded(
+                          child: shimmerUi(height: 8, width: getSize().width * .35),
+                        ),
+                        space(0, width: 8),
                         shimmerUi(height: 8, width: 20),
                       ],
                     ),

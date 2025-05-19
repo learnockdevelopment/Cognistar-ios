@@ -18,7 +18,6 @@ import 'package:webinar/app/pages/main_page/home_page/single_course_page/forum_p
 import 'package:webinar/app/pages/main_page/home_page/single_course_page/single_course_page.dart';
 import 'package:webinar/app/providers/app_language_provider.dart';
 import 'package:webinar/app/providers/user_provider.dart';
-import 'package:webinar/app/services/storage_service.dart';
 import 'package:webinar/app/services/user_service/forum_service.dart';
 import 'package:webinar/common/utils/constants.dart';
 import 'package:webinar/common/utils/download_manager.dart';
@@ -60,10 +59,10 @@ Widget courseSliderItem(CourseModel courseData, {int horizontalPadding = 20}) {
               height: 215,
               decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [
-                Colors.black.withOpacity(.8),
-                Colors.black.withOpacity(0),
-                Colors.black.withOpacity(0),
-              ], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+                    Colors.black.withOpacity(.8),
+                    Colors.black.withOpacity(0),
+                    Colors.black.withOpacity(0),
+                  ], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
               child: Column(
                 children: [
                   // price
@@ -101,7 +100,8 @@ Widget courseSliderItem(CourseModel courseData, {int horizontalPadding = 20}) {
                           width: getSize().width,
                           child: Text(
                             courseData.title ?? '',
-                            style: style16Bold().copyWith(color: Colors.white),
+                            style:
+                            style16Bold().copyWith(color: Colors.white),
                           ),
                         ),
 
@@ -171,13 +171,12 @@ Widget courseSliderItemShimmer() {
 
 Widget courseItem(CourseModel courseData,
     {bool isSmallSize = false,
-    double width = 220.0,
-    double height = 190.0,
-    double endCardPadding = 15.0,
-    bool isShowReward = false}) {
+      double width = 220.0,
+      double height = 190.0,
+      double endCardPadding = 15.0,
+      bool isShowReward = false}) {
   final isFree = courseData.price == 0;
   final hasDiscount = (courseData.discountPercent ?? 0) > 0;
-
   return Container(
     margin: EdgeInsetsDirectional.only(end: endCardPadding),
     width: isSmallSize ? 240 : 260,
@@ -209,8 +208,8 @@ Widget courseItem(CourseModel courseData,
                 height: isSmallSize ? 110 : 160,
                 width: double.infinity,
                 child: ClipRRect(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20)),
                   child: Image.network(
                     courseData.image ?? '',
                     fit: BoxFit.cover,
@@ -222,8 +221,8 @@ Widget courseItem(CourseModel courseData,
               Container(
                 height: isSmallSize ? 110 : 160,
                 decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20)),
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -303,7 +302,8 @@ Widget courseItem(CourseModel courseData,
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                        Icon(Icons.star_rounded,
+                            color: Colors.amber, size: 16),
                         const SizedBox(width: 4),
                         Text(
                           courseData.rate ?? '4.5',
@@ -365,6 +365,7 @@ Widget courseItem(CourseModel courseData,
                 // Price Row
                 _buildPriceSection(courseData, isFree, hasDiscount),
 
+
                 if (!isSmallSize) ...[
                   const SizedBox(height: 16),
                   // Additional Info
@@ -401,13 +402,11 @@ Widget courseItem(CourseModel courseData,
                       ),
                     ),
                     onPressed: () {
-                      nextRoute(SingleCoursePage.pageName, arguments: [
-                        courseData.id,
-                        courseData.type == 'bundle'
-                      ]);
+                      nextRoute(SingleCoursePage.pageName,
+                          arguments: [courseData.id, courseData.type == 'bundle']);
                     },
                     child: Text(
-                      isFree ? 'Enroll Now' : 'Join Us',
+                      isFree ? 'Enroll Now' : 'Add to Cart',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: isSmallSize ? 14 : 16,
@@ -425,8 +424,7 @@ Widget courseItem(CourseModel courseData,
   );
 }
 
-Widget _buildInfoItem(
-    {required IconData icon, required String text, bool isSmall = false}) {
+Widget _buildInfoItem({required IconData icon, required String text, bool isSmall = false}) {
   return Row(
     children: [
       Icon(icon, size: isSmall ? 14 : 16, color: Colors.grey[600]),
@@ -442,463 +440,13 @@ Widget _buildInfoItem(
   );
 }
 
-void _addToCalendar(CourseModel courseData) {
-  // Calendar event logic extracted to simplify widget
-  try {
-    DateTime start = DateTime.fromMillisecondsSinceEpoch(
-        (courseData.startDate ?? 0) * 1000,
-        isUtc: true);
-    DateTime end = start.add(Duration(minutes: courseData.duration ?? 60));
-
-    final Event event = Event(
-      title: courseData.title ?? '',
-      description: appText.webinar,
-      startDate: start,
-      endDate: end,
-    );
-    Add2Calendar.addEvent2Cal(event);
-  } catch (e) {}
-}
-
-// Widget courseItem(CourseModel courseData,{bool isSmallSize=true,double width = 200.0,height = 185.0,double endCardPadding=15.0, bool isShowReward=false}){
-//
-//
-//   if(!isSmallSize){
-//     width = 220;
-//     height = 240;
-//   }
-//
-//
-//
-//   return Container(
-//     clipBehavior: Clip.hardEdge,
-//     decoration: const BoxDecoration(),
-//     margin: EdgeInsetsDirectional.only(end: endCardPadding),
-//     width: width,
-//     height: height,
-//
-//     child: GestureDetector(
-//       onTap: (){
-//         nextRoute(SingleCoursePage.pageName, arguments: [courseData.id, courseData.type == 'bundle']);
-//       },
-//       behavior: HitTestBehavior.opaque,
-//       child: Column(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//
-//           // image
-//           ClipRRect(
-//             borderRadius: borderRadius(radius: 15),
-//             child: Stack(
-//               children: [
-//
-//                 fadeInImage(
-//                   courseData.image ?? '',
-//                   width,
-//                   isSmallSize ? 100 : 140
-//                 ),
-//
-//                 // rate and notification and progress
-//                 Container(
-//                   width: width,
-//                   height: isSmallSize ? 100 : 140,
-//                   decoration: BoxDecoration(
-//                     gradient: LinearGradient(
-//                       colors: [
-//                         Colors.black.withOpacity(.4),
-//                         Colors.black.withOpacity(0),
-//                         Colors.black.withOpacity(0),
-//                       ],
-//                       begin: Alignment.bottomCenter,
-//                       end: Alignment.topCenter
-//                     )
-//                   ),
-//
-//                   child: Column(
-//                     children: [
-//
-//                       // rate
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         children: [
-//
-//                           // rate
-//                           Container(
-//                             margin: const EdgeInsetsDirectional.only(
-//                               start: 8,
-//                               end: 8,
-//                               bottom: 2,
-//                               top: 8
-//                             ),
-//                             // margin: padding(horizontal: 8,vertical: 8),
-//                             padding: padding(horizontal: 8,vertical: 6),
-//
-//                             decoration: BoxDecoration(
-//                               color: Colors.white,
-//                               borderRadius: borderRadius(radius: 10),
-//                               boxShadow: [
-//                                 BoxShadow(
-//                                   color: Colors.black.withOpacity(.05),
-//                                   offset: const Offset(0, 3),
-//                                   blurRadius: 10
-//                                 )
-//                               ]
-//                             ),
-//
-//                             child: Row(
-//                               mainAxisSize: MainAxisSize.min,
-//                               children: [
-//                                 SvgPicture.asset(AppAssets.starYellowSvg,width: 13,),
-//
-//                                 space(0,width: 2),
-//
-//                                 Text(
-//                                   courseData.rate ?? '',
-//                                   style: style12Regular(),
-//                                 ),
-//                               ],
-//                             ),
-//                           ),
-//
-//
-//                           if(CourseUtils.checkType(courseData) == CourseType.live)...{
-//                             GestureDetector(
-//                               onTap: () async {
-//                                 try{
-//
-//                                   DateTime start = DateTime(
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).year,
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).month,
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).day,
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).hour,
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).minute,
-//                                   );
-//                                   DateTime end = DateTime(
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).year,
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).month,
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).day,
-//                                     DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).hour,
-//                                     (DateTime.fromMillisecondsSinceEpoch((courseData.startDate ?? 0) * 1000, isUtc: true).minute + (courseData.duration ?? 0)),
-//                                   );
-//
-//                                   final Event event = Event(
-//                                     title: courseData.title ?? '',
-//                                     description: appText.webinar,
-//                                     startDate: start,
-//                                     endDate: end,
-//                                     iosParams: const IOSParams(),
-//                                     androidParams: const AndroidParams(),
-//                                   );
-//
-//                                   Add2Calendar.addEvent2Cal(event);
-//
-//                                 }catch(e){}
-//                               },
-//                               behavior: HitTestBehavior.opaque,
-//                               child: Container(
-//                                 margin: const EdgeInsetsDirectional.only(
-//                                   start: 8,
-//                                   end: 8,
-//                                   bottom: 2,
-//                                   top: 8
-//                                 ),
-//                                 width: 28,
-//                                 height: 28,
-//
-//                                 decoration: BoxDecoration(
-//                                   color: Colors.white,
-//                                   borderRadius: borderRadius(radius: 8),
-//                                   boxShadow: [
-//                                     BoxShadow(
-//                                       color: Colors.black.withOpacity(.05),
-//                                       offset: const Offset(0, 3),
-//                                       blurRadius: 20
-//                                     )
-//                                   ]
-//                                 ),
-//
-//                                 alignment: Alignment.center,
-//                                 child: SvgPicture.asset(AppAssets.notificationSvg,colorFilter: ColorFilter.mode(blue64(), BlendMode.srcIn),width: 12,),
-//                               )
-//                             ),
-//                           }
-//                         ],
-//                       ),
-//
-//
-//                       const Spacer(),
-//
-//
-//
-//                       if(courseData.badges?.isNotEmpty ?? false)...{
-//
-//                         Align(
-//                           alignment: AlignmentDirectional.centerStart,
-//                           child: Container(
-//                             margin: padding(horizontal: 8),
-//                             padding: padding(horizontal: 6,vertical: 4),
-//
-//                             decoration: BoxDecoration(
-//                               color: getColorFromRGBString(courseData.badges!.first.badge?.background ?? ''),
-//                               borderRadius: borderRadius(radius: 10),
-//                             ),
-//
-//                             child: Row(
-//                               mainAxisSize: MainAxisSize.min,
-//                               children: [
-//
-//                                 if(courseData.badges!.first.badge?.icon != null)...{
-//                                   SvgPicture.network(
-//                                     '${Constants.dommain}${courseData.badges!.first.badge?.icon ?? ''}',
-//                                     width: 16,
-//                                   ),
-//
-//                                   space(0,width: 2),
-//
-//                                 }else...{
-//                                   space(0,width: 2),
-//                                 },
-//
-//                                 Text(
-//                                   courseData.badges!.first.badge?.title ?? '',
-//                                   style: style12Regular().copyWith(
-//                                     color: courseData.badges!.first.badge != null ? Color(int.parse(courseData.badges!.first.badge!.color!.substring(1, 7), radix: 16) + 0xFF000000) : null
-//                                   ),
-//                                 ),
-//
-//                                 space(0,width: 2),
-//                               ],
-//                             ),
-//                           ),
-//                         ),
-//
-//                         space(7),
-//
-//                       }else...{
-//
-//                         if (CourseUtils.checkType(courseData) == CourseType.live)...{
-//
-//                           // progress
-//                           Padding(
-//                             padding: padding(horizontal: 8,vertical: 8),
-//                             child: LayoutBuilder(
-//                               builder: (context, constraints) {
-//                                 return Container(
-//                                   width: constraints.maxWidth,
-//                                   height: 4.5,
-//                                   padding: padding(horizontal: 1.5),
-//                                   decoration: BoxDecoration(
-//                                     color: Colors.white,
-//                                     borderRadius: borderRadius()
-//                                   ),
-//                                   alignment: AlignmentDirectional.centerStart,
-//
-//                                   child: Container(
-//                                     width: constraints.maxWidth * ( (courseData.studentsCount ?? 1) / (courseData.capacity ?? 1) ),
-//                                     height: 2,
-//                                     decoration: BoxDecoration(
-//                                       color: yellow29,
-//                                       borderRadius: borderRadius()
-//                                     ),
-//                                   ),
-//                                 );
-//                               },
-//                             ),
-//                           )
-//
-//                         },
-//                       },
-//
-//                     ],
-//                   ),
-//                 )
-//
-//
-//
-//
-//               ],
-//             ),
-//           ),
-//
-//           // details
-//           Expanded(
-//             child: Padding(
-//               padding: padding(horizontal: 4),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//
-//                   space(10),
-//
-//                   // title
-//                   Text(
-//                     courseData.title ?? '',
-//                     style: style14Bold().copyWith(height: 1.3),
-//                     maxLines: 2,
-//                   ),
-//
-//                   const Spacer(),
-//                   const Spacer(),
-//
-//                   // name and date and time
-//                   SizedBox(
-//                     width: width,
-//                     child: Row(
-//                       children: [
-//
-//                         SizedBox(
-//                           width: (width / 2.3),
-//                           child: Row(
-//                             mainAxisSize: MainAxisSize.min,
-//                             children: [
-//                               SvgPicture.asset(AppAssets.profileSvg),
-//
-//                               space(0,width: 4),
-//
-//                               Expanded(
-//                                 child: Text(
-//                                   courseData.teacher?.fullName ?? '',
-//                                   style: style10Regular().copyWith(color: greyB2),
-//                                   maxLines: 1,
-//                                   overflow: TextOverflow.ellipsis,
-//                                 ),
-//                               ),
-//
-//                               space(0,width: 8),
-//                             ],
-//                           ),
-//                         ),
-//
-//                         if(CourseUtils.checkType(courseData) == CourseType.live)...{
-//                           if(courseData.startDate != null)...{
-//                             Row(
-//                               mainAxisSize: MainAxisSize.min,
-//                               children: [
-//                                 SvgPicture.asset(AppAssets.calendarSvg),
-//
-//                                 space(0,width: 4),
-//
-//                                 Text(
-//                                   DateTime.fromMillisecondsSinceEpoch(courseData.startDate! *  1000, isUtc: true).toDate(),
-//                                   style: style10Regular().copyWith(color: greyB2),
-//                                 ),
-//
-//                               ],
-//                             ),
-//                           }
-//
-//                         }else if(CourseUtils.checkType(courseData) == CourseType.video)...{
-//
-//                           Row(
-//                             mainAxisSize: MainAxisSize.min,
-//                             children: [
-//                               SvgPicture.asset(AppAssets.timeSvg,colorFilter: ColorFilter.mode(greyB2, BlendMode.srcIn)),
-//
-//                               space(0,width: 4),
-//
-//                               Text(
-//                                 '${durationToString(courseData.duration ?? 0)} ${appText.hours}',
-//                                 style: style10Regular().copyWith(color: greyB2),
-//                               ),
-//
-//                             ],
-//                           ),
-//
-//                         },
-//
-//                       ],
-//                     ),
-//                   ),
-//
-//                   const Spacer(),
-//
-//                   // price and type
-//                   SizedBox(
-//                     width: width,
-//                     child: Row(
-//                       children: [
-//
-//                         if(isShowReward)...{
-//                           Text(
-//                             courseData.points?.toString() ?? '-',
-//                             style: style14Regular().copyWith(color: yellow29),
-//                           )
-//                         }else...{
-//
-//                           Text(
-//                             (courseData.price == 0)
-//                               ? appText.free
-//                               : CurrencyUtils.calculator(courseData.price ?? 0),
-//                             style: style12Regular().copyWith(
-//                               color: (courseData.discountPercent ?? 0) > 0 ? greyCF : green77(),
-//                               decoration: (courseData.discountPercent ?? 0) > 0 ? TextDecoration.lineThrough : TextDecoration.none,
-//                               decorationColor: (courseData.discountPercent ?? 0) > 0 ? greyCF : green77(),
-//                             ),
-//                           ),
-//                         },
-//
-//                         if((courseData.discountPercent ?? 0) > 0)...{
-//                           space(0,width: 8),
-//
-//                           Text(
-//                             CurrencyUtils.calculator(
-//                               (courseData.price ?? 0) - ((courseData.price ?? 0) * (courseData.discountPercent ?? 0) ~/ 100)
-//                             ),
-//                             style: style14Regular().copyWith(
-//                               color: green77(),
-//                             ),
-//                           ),
-//                         },
-//
-//                         const Spacer(),
-//
-//                         if((courseData.discountPercent ?? 0) > 0)...{
-//                           Badges.off((courseData.discountPercent ?? 0).toString())
-//
-//                         }else if(CourseUtils.checkType(courseData) == CourseType.live)...{
-//                           Badges.liveClass(),
-//
-//                         }else if(courseData.label == 'Course')...{
-//                           Badges.course(),
-//
-//                         }else if(courseData.label == 'Finished')...{
-//                           Badges.finished(),
-//
-//                         }else if(courseData.label == 'In Progress')...{
-//                           Badges.inProgress(),
-//
-//                         }else if(courseData.label == 'Text course')...{
-//                           Badges.textClass(),
-//
-//                         }else if(courseData.label == 'Not conducted')...{
-//                           Badges.notConducted(),
-//                         }
-//
-//
-//                       ],
-//                     ),
-//                   ),
-//
-//                   // const Spacer(),
-//
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     ),
-//   );
-//
-// }
-
 Widget courseItemVertically(CourseModel courseData,
     {bool isSmallSize = true,
-    double height = 240,
-    double bottomMargin = 16,
-    bool ignoreTap = false,
-    bool isShowReward = false,
-    double imageHeight = 140}) {
+      double height = 240,
+      double bottomMargin = 16,
+      bool ignoreTap = false,
+      bool isShowReward = false,
+      double imageHeight = 140}) {
   final isLive = CourseUtils.checkType(courseData) == CourseType.live;
   final hasDiscount = (courseData.discountPercent ?? 0) > 0;
   final isFree = courseData.price == 0;
@@ -921,7 +469,7 @@ Widget courseItemVertically(CourseModel courseData,
       child: GestureDetector(
         onTap: () => !ignoreTap
             ? nextRoute(SingleCoursePage.pageName,
-                arguments: [courseData.id, courseData.type == 'bundle'])
+            arguments: [courseData.id, courseData.type == 'bundle'])
             : null,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -930,13 +478,11 @@ Widget courseItemVertically(CourseModel courseData,
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   child: Container(
                     width: double.infinity,
                     height: imageHeight,
-                    child:
-                        fadeInImage(courseData.image ?? '', 135, imageHeight),
+                    child: fadeInImage(courseData.image ?? '', 135, imageHeight),
                     foregroundDecoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
@@ -962,9 +508,9 @@ Widget courseItemVertically(CourseModel courseData,
                   Text(
                     courseData.title ?? '',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          height: 1.3,
-                        ),
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1003,8 +549,7 @@ Widget courseItemVertically(CourseModel courseData,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           const SizedBox(width: 16),
-                          Icon(IconlyLight.user2,
-                              size: 16, color: Colors.grey[600]),
+                          Icon(IconlyLight.user2, size: 16, color: Colors.grey[600]),
                           const SizedBox(width: 4),
                           Text(
                             '${courseData.studentsCount}',
@@ -1014,6 +559,7 @@ Widget courseItemVertically(CourseModel courseData,
                       ),
                     ],
                   ),
+
 
                   const SizedBox(height: 16),
 
@@ -1035,8 +581,7 @@ Widget courseItemVertically(CourseModel courseData,
   });
 }
 
-Widget _buildPriceSection(
-    CourseModel courseData, bool isFree, bool hasDiscount) {
+Widget _buildPriceSection(CourseModel courseData, bool isFree, bool hasDiscount) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -1051,13 +596,11 @@ Widget _buildPriceSection(
         ),
       SizedBox(width: 10),
       Text(
-        isFree
-            ? 'Free'
-            : CurrencyUtils.calculator(hasDiscount
-                ? (courseData.price ?? 0) -
-                    ((courseData.price ?? 0) *
-                        (courseData.discountPercent! / 100))
-                : courseData.price ?? 0),
+        isFree ? 'Free' : CurrencyUtils.calculator(
+            hasDiscount
+                ? (courseData.price ?? 0) - ((courseData.price ?? 0) * (courseData.discountPercent! / 100))
+                : courseData.price ?? 0
+        ),
         style: TextStyle(
           color: hasDiscount ? green77() : Colors.black,
           fontSize: 16,
@@ -1088,37 +631,38 @@ Widget _buildDateSection(CourseModel courseData, bool isLive) {
 }
 
 Widget input(
-  TextEditingController controller,
-  FocusNode node,
-  String hint, {
-  String? iconPathLeft,
-  bool isNumber = false,
-  bool isCenter = false,
-  int letterSpacing = 1,
-  bool isReadOnly = false,
-  Function? onTap,
-  int height = 50,
-  bool isPassword = false,
-  Function? onTapLeftIcon,
-  Function? obscureText,
-  int leftIconSize = 8, // Adjusted icon size
-  String? Function(String?)? validator,
-  bool isError = false,
-  Function(String)? onChange,
-  int fontSize = 16,
-  Color leftIconColor = const Color(0xff6E6E6E),
-  double radius = 15,
-  int? maxLength,
-  bool isBorder = false,
-  Color fillColor = Colors.white,
-  int? maxLine,
-  String? title,
-  String? rightIconPath,
-  int rightIconSize = 8, // Adjusted icon size
-  Function? onTapRightIcon,
-  bool? isPasswordVisible,
-  Function()? togglePasswordVisibility,
-}) {
+    TextEditingController controller,
+    FocusNode node,
+    String hint, {
+      String? iconPathLeft,
+      bool isNumber = false,
+      bool isCenter = false,
+      int letterSpacing = 1,
+      bool isReadOnly = false,
+      Function? onTap,
+      int height = 50,
+      bool isPassword = false,
+      Function? onTapLeftIcon,
+      Function? obscureText,
+      int leftIconSize = 8, // Adjusted icon size
+      String? Function(String?)? validator,
+      bool isError = false,
+      Function(String)? onChange,
+      int fontSize = 16,
+      Color leftIconColor = const Color(0xff6E6E6E),
+      double radius = 15,
+      int? maxLength,
+      bool isBorder = false,
+      Color fillColor = Colors.white,
+      int? maxLine,
+      String? title,
+      String? rightIconPath,
+      int rightIconSize = 8, // Adjusted icon size
+      Function? onTapRightIcon,
+      bool? isPasswordVisible,
+      Function()? togglePasswordVisibility,
+      String? errorText,
+    }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
@@ -1126,7 +670,7 @@ Widget input(
       if (title != null) ...{
         Padding(
           padding:
-              const EdgeInsets.symmetric(horizontal: 6.0).copyWith(top: 10),
+          const EdgeInsets.symmetric(horizontal: 6.0).copyWith(top: 10),
           child: Text(
             title,
             style: style12Regular().copyWith(
@@ -1167,67 +711,82 @@ Widget input(
           ],
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(
-              vertical:
-                  15.0, // Increased vertical padding to move text down more
-              horizontal: 15.0, // Horizontal padding remains the same
+              vertical: 15.0,
+              horizontal: 15.0,
             ),
-
             hintText: hint,
             hintStyle: TextStyle(
-              fontSize: 16, // Change the font size of hint text
-              height: 1.5, // This moves the label down by adjusting line height
-              color: Colors.grey.shade600, // Change hint text color
+              fontSize: 16,
+              height: 1.5,
+              color: Colors.grey.shade600,
               fontFamily: 'Roboto',
             ),
-
             prefixIcon: iconPathLeft != null
                 ? GestureDetector(
-                    onTap: () => onTapLeftIcon?.call(),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 7.0),
-                      child: SvgPicture.asset(
-                        iconPathLeft,
-                        width: leftIconSize.toDouble(),
-                        height: leftIconSize.toDouble(),
-                        color: leftIconColor,
-                      ),
-                    ),
-                  )
+              onTap: () => onTapLeftIcon?.call(),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 7.0),
+                child: SvgPicture.asset(
+                  iconPathLeft,
+                  width: leftIconSize.toDouble(),
+                  height: leftIconSize.toDouble(),
+                  color: leftIconColor,
+                ),
+              ),
+            )
                 : null,
             suffixIcon: isPassword
                 ? IconButton(
-                    icon: Icon(
-                      isPasswordVisible ?? false
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: Colors.grey.shade600,
-                    ),
-                    onPressed: togglePasswordVisibility,
-                  )
+              icon: Icon(
+                isPasswordVisible ?? false
+                    ? Icons.visibility
+                    : Icons.visibility_off,
+                color: Colors.grey.shade600,
+              ),
+              onPressed: togglePasswordVisibility,
+            )
                 : rightIconPath != null
-                    ? GestureDetector(
-                        onTap: () => onTapRightIcon?.call(),
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 12.0),
-                          child: SvgPicture.asset(
-                            rightIconPath,
-                            width: rightIconSize.toDouble(),
-                            height: rightIconSize.toDouble(),
-                          ),
-                        ),
-                      )
-                    : null,
-
+                ? GestureDetector(
+              onTap: () => onTapRightIcon?.call(),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: SvgPicture.asset(
+                  rightIconPath,
+                  width: rightIconSize.toDouble(),
+                  height: rightIconSize.toDouble(),
+                ),
+              ),
+            )
+                : null,
+            errorText: errorText,
+            errorStyle: TextStyle(
+              color: Colors.red,
+              fontSize: 12,
+              height: 1.5,
+            ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(radius),
               borderSide: const BorderSide(color: Colors.red, width: 1),
             ),
-            border: InputBorder.none, // This removes the underline
-            focusedBorder:
-                InputBorder.none, // This removes the underline when focused
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
           ),
         ),
       ),
+      if (errorText != null) ...[
+        SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: Text(
+            errorText,
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 12,
+              height: 1.5,
+            ),
+          ),
+        ),
+      ],
     ],
   );
 }
@@ -1235,26 +794,26 @@ Widget input(
 Widget descriptionInput(
     TextEditingController controller, FocusNode node, String hint,
     {String? iconPathLeft,
-    bool isNumber = false,
-    bool isCenter = false,
-    int letterSpacing = 1,
-    bool isReadOnly = false,
-    Function? onTap,
-    int height = 52,
-    bool isPassword = false,
-    Function? onTapLeftIcon,
-    Function? obscureText,
-    int leftIconSize = 14,
-    String? Function(String?)? validator,
-    bool isError = false,
-    Function(String)? onChange,
-    int fontSize = 16,
-    Color leftIconColor = const Color(0xff6E6E6E),
-    double radius = 20,
-    int? maxLength,
-    bool isBorder = false,
-    Color fillColor = Colors.white,
-    int maxLine = 8}) {
+      bool isNumber = false,
+      bool isCenter = false,
+      int letterSpacing = 1,
+      bool isReadOnly = false,
+      Function? onTap,
+      int height = 52,
+      bool isPassword = false,
+      Function? onTapLeftIcon,
+      Function? obscureText,
+      int leftIconSize = 14,
+      String? Function(String?)? validator,
+      bool isError = false,
+      Function(String)? onChange,
+      int fontSize = 16,
+      Color leftIconColor = const Color(0xff6E6E6E),
+      double radius = 20,
+      int? maxLength,
+      bool isBorder = false,
+      Color fillColor = Colors.white,
+      int maxLine = 8}) {
   return Theme(
     data: Theme.of(navigatorKey.currentContext!)
         .copyWith(colorScheme: ColorScheme.light(error: red49)),
@@ -1290,8 +849,8 @@ Widget descriptionInput(
       textAlign: isCenter
           ? TextAlign.center
           : isNumber
-              ? TextAlign.end
-              : TextAlign.start,
+          ? TextAlign.end
+          : TextAlign.start,
 
       // autofillHints: const [ AutofillHints.oneTimeCode ],
       inputFormatters: [LengthLimitingTextInputFormatter(maxLength)],
@@ -1425,55 +984,6 @@ Widget horizontalCategoryItem(Color color, String icon, String title,
   );
 }
 
-// Widget horizontalCategoryItem(Color color, String icon, String title,
-//     String courseCount, Function onTap) {
-//
-//   return GestureDetector(
-//     onTap: () {
-//       onTap();
-//     },
-//     child: Container(
-//       width: getSize().width * .7,
-//       margin: const EdgeInsetsDirectional.only(end: 16),
-//       padding: padding(horizontal: 16, vertical: 16),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: borderRadius(radius: 15),
-//       ),
-//       child: Row(
-//         children: [
-//           Container(
-//             width: 68,
-//             height: 68,
-//             decoration: BoxDecoration(
-//               color: color,
-//               borderRadius: borderRadius(radius: 8),
-//             ),
-//             alignment: Alignment.center,
-//             child: Image.network(icon, width: 24),
-//           ),
-//           space(0, width: 16),
-//           Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               Text(
-//                 title,
-//                 style: style14Bold(),
-//               ),
-//               space(4),
-//               Text(
-//                 '$courseCount ${appText.courses}',
-//                 style: style12Regular().copyWith(color: greyA5),
-//               ),
-//             ],
-//           )
-//         ],
-//       ),
-//     ),
-//   );
-// }
-
 Widget horizontalNoticesItem(Color color, String icon, String title,
     String name, String date, Function onTap) {
   return GestureDetector(
@@ -1502,7 +1012,7 @@ Widget horizontalNoticesItem(Color color, String icon, String title,
             child: SvgPicture.asset(icon,
                 width: 24,
                 colorFilter:
-                    const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+                const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
           ),
 
           space(0, width: 16),
@@ -1567,10 +1077,10 @@ Widget horizontalNoticesItem(Color color, String icon, String title,
 Widget horizontalChapterItem(
     Color color, String icon, String title, String subTitle, Function onTap,
     {double width = 24,
-    double height = 24,
-    bool isFixWidth = false,
-    bool transparentColor = false,
-    Color? iconColor}) {
+      double height = 24,
+      bool isFixWidth = false,
+      bool transparentColor = false,
+      Color? iconColor}) {
   return GestureDetector(
     onTap: () {
       onTap();
@@ -1773,100 +1283,188 @@ Widget checkButton(
   );
 }
 
-AppBar appbar(
-    {required String title,
-    Function onTapLeftIcon = backRoute,
-    String? leftIcon = AppAssets.backSvg,
-    bool isBasket = false,
-    Color? background = Colors.white,
-    Function onTapRightIcon = backRoute,
-    String? rightIcon,
-    double? rightWidth}) {
+AppBar appbar({
+  required String title,
+  Function? onTapLeftIcon,
+  String? leftIcon,
+  bool isBasket = false,
+  Color? backgroundColor,
+  Function? onTapRightIcon,
+  String? rightIcon,
+  double? rightWidth,
+  bool showBackButton = true,
+  List<Widget>? actions,
+  bool centerTitle = true,
+  double elevation = 0,
+  Color? titleColor,
+  double? titleSize,
+  FontWeight? titleWeight,
+  Widget? titleWidget,
+  double? height,
+  bool showDivider = false,
+  Color? dividerColor,
+  double? horizontalPadding,
+  bool isTransparent = false,
+  Widget? leading,
+  PreferredSizeWidget? bottom,
+}) {
   return AppBar(
-    systemOverlayStyle: const SystemUiOverlayStyle(
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.light,
+    systemOverlayStyle: SystemUiOverlayStyle(
+      statusBarIconBrightness: isTransparent ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isTransparent ? Brightness.dark : Brightness.light,
+      statusBarColor: Colors.transparent,
     ),
-    titleSpacing: 20,
-    backgroundColor: primaryColor,
-    elevation: 0,
-    shadowColor: Colors.transparent,
+    titleSpacing: 0,
+    backgroundColor: isTransparent ? Colors.transparent : (backgroundColor ?? primaryColor),
+    elevation: elevation,
+    shadowColor: Colors.black.withOpacity(0.1),
     surfaceTintColor: Colors.transparent,
     automaticallyImplyLeading: false,
-    centerTitle: true,
+    centerTitle: centerTitle,
+    toolbarHeight: height ?? 65,
+    bottom: bottom,
+    flexibleSpace: Container(
+      decoration: BoxDecoration(
+        color: isTransparent ? Colors.transparent : (backgroundColor ?? primaryColor),
+        boxShadow: [
+          if (!isTransparent)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+        ],
+        border: showDivider ? Border(
+          bottom: BorderSide(
+            color: dividerColor ?? Colors.grey.withOpacity(0.1),
+            width: 1,
+          ),
+        ) : null,
+      ),
+    ),
     title: Directionality(
       textDirection: TextDirection.ltr,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 9, top: 13),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding ?? 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (leftIcon == null) ...{
-              const SizedBox(width: 52, height: 52)
-            } else ...{
-              closeButton(leftIcon, onTap: onTapLeftIcon),
-            },
+            // Left side
+            if (showBackButton) ...[
+              if (leading != null)
+                leading
+              else if (leftIcon != null)
+                _buildIconButton(
+                  icon: leftIcon,
+                  onTap: onTapLeftIcon ?? backRoute,
+                  isLeft: true,
+                )
+              else
+                _buildIconButton(
+                  icon: AppAssets.backSvg,
+                  onTap: onTapLeftIcon ?? backRoute,
+                  isLeft: true,
+                )
+            ] else
+              const SizedBox(width: 52),
+
+            // Center
             Expanded(
               child: Padding(
-                padding: padding(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Center(
-                  child: Text(
+                  child: titleWidget ?? Text(
                     title,
-                    style: style16Regular().copyWith(color: Colors.white),
+                    style: style16Regular().copyWith(
+                      color: titleColor ?? Colors.white,
+                      fontSize: titleSize ?? 18,
+                      fontWeight: titleWeight ?? FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                 ),
               ),
             ),
-            if (StorageService.getCanPurchase())
-              if (isBasket) ...{
-                Consumer<UserProvider>(
-                  builder: (context, provider, child) {
-                    return GestureDetector(
-                      onTap: () {
-                        nextRoute(CartPage.pageName);
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: borderRadius(radius: 15),
-                        ),
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment.center,
-                              child: SvgPicture.asset(
-                                AppAssets.basketSvg,
-                                colorFilter:
-                                    ColorFilter.mode(blue64(), BlendMode.srcIn),
-                              ),
-                            ),
-                            if (provider.cartData?.items?.isNotEmpty ??
-                                false) ...{
-                              Positioned(
-                                  top: 17,
-                                  right: 13,
-                                  child: Container(
-                                    width: 7,
-                                    height: 7,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle, color: red49),
-                                  ))
-                            }
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+
+            // Right side
+            if (isBasket)
+              Consumer<UserProvider>(
+                builder: (context, provider, child) {
+                  return _buildIconButton(
+                    icon: AppAssets.basketSvg,
+                    onTap: () => nextRoute(CartPage.pageName),
+                    isBasket: true,
+                    hasItems: provider.cartData?.items?.isNotEmpty ?? false,
+                  );
+                },
+              )
+            else if (rightIcon != null)
+              _buildIconButton(
+                icon: rightIcon,
+                onTap: onTapRightIcon ?? backRoute,
+                width: rightWidth,
+              )
+            else if (actions != null)
+              ...actions
+            else
+              const SizedBox(width: 52),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _buildIconButton({
+  required String icon,
+  required Function onTap,
+  bool isLeft = false,
+  bool isBasket = false,
+  bool hasItems = false,
+  double? width,
+}) {
+  return Material(
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: () => onTap(),
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          color: isBasket ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: isBasket ? [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: SvgPicture.asset(
+                icon,
+                width: width ?? 22,
+                colorFilter: isBasket ? ColorFilter.mode(blue64(), BlendMode.srcIn) : null,
+              ),
+            ),
+            if (hasItems)
+              Positioned(
+                top: 17,
+                right: 13,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: red49,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
                 ),
-              } else if (rightIcon != null) ...{
-                closeButton(rightIcon,
-                    onTap: onTapRightIcon, width: rightWidth),
-              } else ...{
-                const SizedBox(width: 52, height: 52)
-              }
+              ),
           ],
         ),
       ),
@@ -1876,22 +1474,22 @@ AppBar appbar(
 
 Widget button(
     {required Function onTap,
-    required double? width,
-    required double height,
-    required String text,
-    required Color bgColor,
-    required Color textColor,
-    Color? iconColor,
-    Color? borderColor,
-    int raduis = 20,
-    BoxShadow? boxShadow,
-    String? iconPath,
-    int fontSize = 14,
-    textFontWeight = FontWeight.normal,
-    bool isLoading = false,
-    Color? loadingColor,
-    int horizontalPadding = 0,
-    int? icWidth}) {
+      required double? width,
+      required double height,
+      required String text,
+      required Color bgColor,
+      required Color textColor,
+      Color? iconColor,
+      Color? borderColor,
+      int raduis = 20,
+      BoxShadow? boxShadow,
+      String? iconPath,
+      int fontSize = 14,
+      textFontWeight = FontWeight.normal,
+      bool isLoading = false,
+      Color? loadingColor,
+      int horizontalPadding = 0,
+      int? icWidth}) {
   return GestureDetector(
     onTap: () {
       onTap();
@@ -1903,13 +1501,13 @@ Widget button(
         height: height.toDouble(),
         alignment: Alignment.center,
         padding:
-            padding(horizontal: isLoading ? 0 : horizontalPadding.toDouble()),
+        padding(horizontal: isLoading ? 0 : horizontalPadding.toDouble()),
         decoration: BoxDecoration(
             color: bgColor,
             border:
-                Border.all(color: borderColor ?? Colors.transparent, width: 1),
+            Border.all(color: borderColor ?? Colors.transparent, width: 1),
             borderRadius:
-                borderRadius(radius: isLoading ? 100 : raduis.toDouble()),
+            borderRadius(radius: isLoading ? 100 : raduis.toDouble()),
             boxShadow: [
               if (boxShadow != null) ...{boxShadow}
             ]),
@@ -1940,14 +1538,14 @@ Widget button(
                       color: textColor,
                       fontWeight: textFontWeight // Set fontWeight to bold
 
-                      ),
+                  ),
                 ),
               }
             ],
           ),
           secondChild: loading(color: loadingColor ?? Colors.white),
           crossFadeState:
-              isLoading ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          isLoading ? CrossFadeState.showSecond : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 200),
         )),
   );
@@ -1984,53 +1582,53 @@ showSnackBar(ErrorEnum type, String? title,
       .showSnackBar(SnackBar(
     content: directionality(
         child: Container(
-      width: getSize().width,
-      padding: padding(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: borderRadius(),
-          border: Border.all(color: greyE7, width: 1)),
-      child: Row(
-        children: [
-          Container(
-            width: 45,
-            height: 45,
-            decoration: BoxDecoration(
-                color: type == ErrorEnum.success
-                    ? green77()
-                    : type == ErrorEnum.error
+          width: getSize().width,
+          padding: padding(horizontal: 10, vertical: 10),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: borderRadius(),
+              border: Border.all(color: greyE7, width: 1)),
+          child: Row(
+            children: [
+              Container(
+                width: 45,
+                height: 45,
+                decoration: BoxDecoration(
+                    color: type == ErrorEnum.success
+                        ? green77()
+                        : type == ErrorEnum.error
                         ? red49
                         : yellow29,
-                shape: BoxShape.circle),
-            alignment: Alignment.center,
-            child: SvgPicture.asset(type == ErrorEnum.success
-                ? AppAssets.checkSvg
-                : type == ErrorEnum.error
+                    shape: BoxShape.circle),
+                alignment: Alignment.center,
+                child: SvgPicture.asset(type == ErrorEnum.success
+                    ? AppAssets.checkSvg
+                    : type == ErrorEnum.error
                     ? AppAssets.clearSvg
                     : AppAssets.alertSvg),
-          ),
-          space(0, width: 9),
-          Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (title != null) ...{
-                Text(
-                  title,
-                  style: style14Bold(),
-                )
-              },
-              if (desc != null) ...{
-                Text(
-                  desc,
-                  style: style12Regular().copyWith(color: greyB2),
-                )
-              },
+              ),
+              space(0, width: 9),
+              Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (title != null) ...{
+                        Text(
+                          title,
+                          style: style14Bold(),
+                        )
+                      },
+                      if (desc != null) ...{
+                        Text(
+                          desc,
+                          style: style12Regular().copyWith(color: greyB2),
+                        )
+                      },
+                    ],
+                  ))
             ],
-          ))
-        ],
-      ),
-    )),
+          ),
+        )),
     duration: Duration(seconds: time),
     backgroundColor: Colors.transparent,
     elevation: 0,
@@ -2068,8 +1666,8 @@ Widget userProfileCard(UserModel user, Function onTap) {
                   color: user.meetingStatus == 'no'
                       ? red49.withOpacity(.3)
                       : user.meetingStatus == 'available'
-                          ? green77().withOpacity(.3)
-                          : greyCF.withOpacity(.3),
+                      ? green77().withOpacity(.3)
+                      : greyCF.withOpacity(.3),
                 ),
                 alignment: Alignment.center,
                 child: SvgPicture.asset(
@@ -2079,8 +1677,8 @@ Widget userProfileCard(UserModel user, Function onTap) {
                       user.meetingStatus == 'no'
                           ? red49
                           : user.meetingStatus == 'available'
-                              ? green77()
-                              : greyCF,
+                          ? green77()
+                          : greyCF,
                       BlendMode.srcIn),
                 ),
               ),
@@ -2184,12 +1782,12 @@ Widget userProfileCard(UserModel user, Function onTap) {
 Widget userCard(String image, String title, String desc, String date,
     String price, String type, Function onTap,
     {Time? time,
-    String? userGrade,
-    String? gradeStatus,
-    int imageWidth = 70,
-    int paddingValue = 14,
-    int titleAndDescSpace = 2,
-    Function? onTapSubtitle}) {
+      String? userGrade,
+      String? gradeStatus,
+      int imageWidth = 70,
+      int paddingValue = 14,
+      int titleAndDescSpace = 2,
+      Function? onTapSubtitle}) {
   return GestureDetector(
     onTap: () {
       onTap();
@@ -2202,7 +1800,7 @@ Widget userCard(String image, String title, String desc, String date,
           vertical: paddingValue.toDouble()),
       margin: const EdgeInsets.only(bottom: 15),
       decoration:
-          BoxDecoration(color: Colors.white, borderRadius: borderRadius()),
+      BoxDecoration(color: Colors.white, borderRadius: borderRadius()),
       child: Row(
         children: [
           ClipRRect(
@@ -2275,7 +1873,7 @@ Widget userCard(String image, String title, String desc, String date,
                           SvgPicture.asset(
                             AppAssets.timeSvg,
                             colorFilter:
-                                ColorFilter.mode(greyA5, BlendMode.srcIn),
+                            ColorFilter.mode(greyA5, BlendMode.srcIn),
                           ),
                           space(0, width: 4),
                           Text(
@@ -2304,10 +1902,10 @@ Widget userCard(String image, String title, String desc, String date,
                                 gradeStatus == 'passed'
                                     ? green77()
                                     : gradeStatus == 'waiting'
-                                        ? yellow29
-                                        : gradeStatus == 'failed'
-                                            ? red49
-                                            : yellow29,
+                                    ? yellow29
+                                    : gradeStatus == 'failed'
+                                    ? red49
+                                    : yellow29,
                                 BlendMode.srcIn),
                             width: 9,
                           ),
@@ -2320,10 +1918,10 @@ Widget userCard(String image, String title, String desc, String date,
                               color: gradeStatus == 'passed'
                                   ? green77()
                                   : gradeStatus == 'waiting'
-                                      ? yellow29
-                                      : gradeStatus == 'failed'
-                                          ? red49
-                                          : yellow29,
+                                  ? yellow29
+                                  : gradeStatus == 'failed'
+                                  ? red49
+                                  : yellow29,
                             ),
                           ),
 
@@ -2402,10 +2000,10 @@ Widget blogItem(BlogModel blog, Function onTap) {
                     decoration: BoxDecoration(
                         gradient: LinearGradient(
                             colors: [
-                          Colors.black.withOpacity(.7),
-                          Colors.black.withOpacity(.1),
-                          Colors.black.withOpacity(0),
-                        ],
+                              Colors.black.withOpacity(.7),
+                              Colors.black.withOpacity(.1),
+                              Colors.black.withOpacity(0),
+                            ],
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter)),
                     alignment: Alignment.bottomLeft,
@@ -2451,9 +2049,9 @@ Widget blogItem(BlogModel blog, Function onTap) {
                               blog.badges!.first.badge?.title ?? '',
                               style: style12Regular().copyWith(
                                   color: Color(int.parse(
-                                          blog.badges!.first.badge!.color!
-                                              .substring(1, 7),
-                                          radix: 16) +
+                                      blog.badges!.first.badge!.color!
+                                          .substring(1, 7),
+                                      radix: 16) +
                                       0xFF000000)),
                             ),
                             space(0, width: 2),
@@ -2499,7 +2097,7 @@ Widget blogItem(BlogModel blog, Function onTap) {
                             timeStampToDate((blog.createdAt ?? 0) * 1000)
                                 .toString(),
                             style:
-                                style12Regular().copyWith(color: Colors.white),
+                            style12Regular().copyWith(color: Colors.white),
                           ),
                         ),
                       ],
@@ -2516,7 +2114,7 @@ Widget blogItem(BlogModel blog, Function onTap) {
                           child: Text(
                             '${blog.commentCount} ${appText.comments}',
                             style:
-                                style12Regular().copyWith(color: Colors.white),
+                            style12Regular().copyWith(color: Colors.white),
                           ),
                         ),
                       ],
@@ -2534,16 +2132,16 @@ Widget blogItem(BlogModel blog, Function onTap) {
 
 Widget userProfile(UserModel user,
     {bool showRate = false,
-    String? customRate,
-    String? customSubtitle,
-    bool isBoldTitle = false,
-    bool isBackground = false,
-    bool isBoxLimited = false}) {
+      String? customRate,
+      String? customSubtitle,
+      bool isBoldTitle = false,
+      bool isBackground = false,
+      bool isBoxLimited = false}) {
   return Container(
     padding: isBackground ? padding(horizontal: 12, vertical: 12) : null,
     decoration: isBackground
         ? BoxDecoration(
-            color: Colors.white, borderRadius: borderRadius(radius: 10))
+        color: Colors.white, borderRadius: borderRadius(radius: 10))
         : null,
     width: isBoxLimited ? 240 : null,
     child: Row(
@@ -2596,9 +2194,9 @@ Widget dropDown(
     Function(String newValue, int index) onTap,
     bool isOpen,
     {String? icon,
-    int iconSize = 16,
-    String? title,
-    bool isBorder = true}) {
+      int iconSize = 16,
+      String? title,
+      bool isBorder = true}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -2750,9 +2348,9 @@ Widget faqDropDown(
               space(0, width: 8),
               Expanded(
                   child: Text(
-                title,
-                style: style14Bold(),
-              )),
+                    title,
+                    style: style14Bold(),
+                  )),
               space(0, width: 12),
               Icon(
                 isOpen
@@ -2773,7 +2371,7 @@ Widget faqDropDown(
             ),
             secondChild: SizedBox(width: getSize().width),
             crossFadeState:
-                isOpen ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+            isOpen ? CrossFadeState.showFirst : CrossFadeState.showSecond,
             duration: const Duration(milliseconds: 300)),
       ],
     ),
@@ -2787,8 +2385,8 @@ Widget commentUi(Comments comment, Function onTapOption) {
     padding: padding(horizontal: 16, vertical: 16),
     margin: const EdgeInsets.only(bottom: 16),
     decoration: BoxDecoration(color: Colors.white, borderRadius: borderRadius()
-        // border: Border.all()
-        ),
+      // border: Border.all()
+    ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2872,7 +2470,7 @@ Widget commentUi(Comments comment, Function onTapOption) {
                   Text(
                     comment.replies![i].comment ?? '',
                     style:
-                        style14Regular().copyWith(color: greyA5, height: 1.5),
+                    style14Regular().copyWith(color: greyA5, height: 1.5),
                   ),
 
                   space(14),
@@ -2880,7 +2478,7 @@ Widget commentUi(Comments comment, Function onTapOption) {
                   Text(
                     timeStampToDate((comment.replies![i].createAt ?? 0) * 1000),
                     style:
-                        style12Regular().copyWith(color: greyA5, height: 1.5),
+                    style12Regular().copyWith(color: greyA5, height: 1.5),
                   ),
                 ],
               ),
@@ -2956,10 +2554,10 @@ Widget dashboardInfoBox(
 
 Widget forumQuestionItem(Forums question, Function changeState,
     {bool ignoreOnTap = false,
-    bool isShowDownload = false,
-    bool isShowAnswerCount = true,
-    bool isShowMoreIcon = true,
-    Function? getData}) {
+      bool isShowDownload = false,
+      bool isShowAnswerCount = true,
+      bool isShowMoreIcon = true,
+      Function? getData}) {
   return Stack(
     clipBehavior: Clip.none,
     children: [
@@ -2975,7 +2573,7 @@ Widget forumQuestionItem(Forums question, Function changeState,
           margin: const EdgeInsets.only(bottom: 16),
           padding: padding(horizontal: 16, vertical: 16),
           decoration:
-              BoxDecoration(color: Colors.white, borderRadius: borderRadius()),
+          BoxDecoration(color: Colors.white, borderRadius: borderRadius()),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -2989,7 +2587,7 @@ Widget forumQuestionItem(Forums question, Function changeState,
                       ClipRRect(
                           borderRadius: borderRadius(radius: 100),
                           child:
-                              fadeInImage(question.user?.avatar ?? '', 40, 40)),
+                          fadeInImage(question.user?.avatar ?? '', 40, 40)),
                       space(0, width: 8),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3112,12 +2710,12 @@ Widget forumQuestionItem(Forums question, Function changeState,
                           children: [
                             SizedBox(
                               width: (((((question.activeUsers?.length ?? 0) >
-                                                  3)
-                                              ? 3
-                                              : (question.activeUsers?.length ??
-                                                  0)) -
-                                          1) *
-                                      17) +
+                                  3)
+                                  ? 3
+                                  : (question.activeUsers?.length ??
+                                  0)) -
+                                  1) *
+                                  17) +
                                   34,
                               height: 35,
                               child: Stack(
@@ -3125,17 +2723,17 @@ Widget forumQuestionItem(Forums question, Function changeState,
                                     ((question.activeUsers?.length ?? 0) > 3)
                                         ? 3
                                         : (question.activeUsers?.length ?? 0),
-                                    (i) {
-                                  return PositionedDirectional(
-                                      start: i == 0 ? 0 : i * 17,
-                                      child: ClipRRect(
-                                          borderRadius:
+                                        (i) {
+                                      return PositionedDirectional(
+                                          start: i == 0 ? 0 : i * 17,
+                                          child: ClipRRect(
+                                              borderRadius:
                                               borderRadius(radius: 50),
-                                          child: fadeInImage(
-                                              question.activeUsers?[i] ?? '',
-                                              34,
-                                              34)));
-                                }),
+                                              child: fadeInImage(
+                                                  question.activeUsers?[i] ?? '',
+                                                  34,
+                                                  34)));
+                                    }),
                               ),
                             ),
                             space(0, width: 6),
@@ -3149,7 +2747,7 @@ Widget forumQuestionItem(Forums question, Function changeState,
                                 Text(
                                   appText.activeUsers,
                                   style:
-                                      style10Regular().copyWith(color: greyA5),
+                                  style10Regular().copyWith(color: greyA5),
                                 ),
                               ],
                             )
@@ -3192,17 +2790,17 @@ Widget forumQuestionItem(Forums question, Function changeState,
                   onTap: () {
                     if (!question.isDownload) {
                       DownloadManager.download(question.attachment!,
-                          (progress) {
-                        if (progress <= 90) {
-                          if (!question.isDownload) {
-                            question.isDownload = true;
-                            changeState();
-                          }
-                        } else {
-                          question.isDownload = false;
-                          changeState();
-                        }
-                      });
+                              (progress) {
+                            if (progress <= 90) {
+                              if (!question.isDownload) {
+                                question.isDownload = true;
+                                changeState();
+                              }
+                            } else {
+                              question.isDownload = false;
+                              changeState();
+                            }
+                          });
                     }
                   },
                   child: Container(
@@ -3229,7 +2827,7 @@ Widget forumQuestionItem(Forums question, Function changeState,
                                 Text(
                                   question.attachment?.split('/').last ?? '',
                                   style:
-                                      style12Regular().copyWith(color: greyA5),
+                                  style12Regular().copyWith(color: greyA5),
                                 )
                               ],
                             ),
@@ -3255,7 +2853,7 @@ Widget forumQuestionItem(Forums question, Function changeState,
               width: 28,
               height: 28,
               decoration:
-                  BoxDecoration(color: yellow29, shape: BoxShape.circle),
+              BoxDecoration(color: yellow29, shape: BoxShape.circle),
               alignment: Alignment.center,
               child: SvgPicture.asset(AppAssets.bookmarkSvg),
             ))
@@ -3275,7 +2873,7 @@ Widget forumAnswerItem(ForumAnswerModel answer, Function changeState,
         margin: const EdgeInsets.only(bottom: 16),
         padding: padding(horizontal: 16, vertical: 16),
         decoration:
-            BoxDecoration(color: Colors.white, borderRadius: borderRadius()),
+        BoxDecoration(color: Colors.white, borderRadius: borderRadius()),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -3290,24 +2888,24 @@ Widget forumAnswerItem(ForumAnswerModel answer, Function changeState,
                 GestureDetector(
                   onTap: () async {
                     LearningWidget.forumOptionSheet(answer.can!, answer.pin!,
-                        () {
-                      answer.pin = !(answer.pin ?? true);
-                      ForumService.answerPin(answer.id!);
+                            () {
+                          answer.pin = !(answer.pin ?? true);
+                          ForumService.answerPin(answer.id!);
 
-                      changeState();
-                    }, () {
-                      answer.resolved = !(answer.resolved ?? true);
-                      ForumService.answerResolve(answer.id!);
+                          changeState();
+                        }, () {
+                          answer.resolved = !(answer.resolved ?? true);
+                          ForumService.answerResolve(answer.id!);
 
-                      changeState();
-                    }, () async {
-                      bool? res = await LearningWidget.forumReplaySheet(null,
-                          isEdit: true, answer: answer);
+                          changeState();
+                        }, () async {
+                          bool? res = await LearningWidget.forumReplaySheet(null,
+                              isEdit: true, answer: answer);
 
-                      if (res != null && res) {
-                        getNewData!();
-                      }
-                    });
+                          if (res != null && res) {
+                            getNewData!();
+                          }
+                        });
                   },
                   behavior: HitTestBehavior.opaque,
                   child: SizedBox(
@@ -3394,7 +2992,7 @@ Widget forumAnswerItem(ForumAnswerModel answer, Function changeState,
               width: 28,
               height: 28,
               decoration:
-                  BoxDecoration(color: yellow29, shape: BoxShape.circle),
+              BoxDecoration(color: yellow29, shape: BoxShape.circle),
               alignment: Alignment.center,
               child: SvgPicture.asset(AppAssets.bookmarkSvg),
             ))
@@ -3430,18 +3028,18 @@ Widget helperBox(String icon, String title, String subTitle,
         // title
         Expanded(
             child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: style14Bold(),
-            ),
-            Text(
-              subTitle,
-              style: style12Regular().copyWith(color: greyB2),
-            ),
-          ],
-        )),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: style14Bold(),
+                ),
+                Text(
+                  subTitle,
+                  style: style12Regular().copyWith(color: greyB2),
+                ),
+              ],
+            )),
       ],
     ),
   );
@@ -3456,65 +3054,65 @@ Future downloadSheet(String downloadUrl, String name,
 
   return await baseBottomSheet(
       child: StatefulBuilder(builder: (context, state) {
-    if (!isStartDownload) {
-      isStartDownload = true;
+        if (!isStartDownload) {
+          isStartDownload = true;
 
-      DownloadManager.download(
-          downloadUrl,
-          (va) {
-            progress = va / 100;
-            state(() {});
-          },
-          name: name,
-          cancelToken: cancelToken,
-          onLoadAtLocal: () {
-            if (context.mounted) {
-              backRoute();
-            }
-          },
-          isOpen: isOpen);
-    }
-
-    return Padding(
-      padding: padding(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          space(20),
-          Text(
-            appText.download,
-            style: style16Bold(),
-          ),
-          space(25),
-          Text(
-            '${(progress * 100).toInt()} %',
-            style: style14Regular(),
-          ),
-          space(6),
-          LinearProgressIndicator(
-            backgroundColor: green77().withOpacity(.2),
-            value: progress,
-            valueColor: AlwaysStoppedAnimation<Color>(green77()),
-          ),
-          space(40),
-          button(
-              onTap: () async {
-                cancelToken.cancel();
-
-                await Future.delayed(const Duration(milliseconds: 600));
-
+          DownloadManager.download(
+              downloadUrl,
+                  (va) {
+                progress = va / 100;
+                state(() {});
+              },
+              name: name,
+              cancelToken: cancelToken,
+              onLoadAtLocal: () {
                 if (context.mounted) {
                   backRoute();
                 }
               },
-              width: getSize().width,
-              height: 52,
-              text: appText.cancel,
-              bgColor: green77(),
-              textColor: Colors.white),
-          space(30),
-        ],
-      ),
-    );
-  }));
+              isOpen: isOpen);
+        }
+
+        return Padding(
+          padding: padding(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              space(20),
+              Text(
+                appText.download,
+                style: style16Bold(),
+              ),
+              space(25),
+              Text(
+                '${(progress * 100).toInt()} %',
+                style: style14Regular(),
+              ),
+              space(6),
+              LinearProgressIndicator(
+                backgroundColor: green77().withOpacity(.2),
+                value: progress,
+                valueColor: AlwaysStoppedAnimation<Color>(green77()),
+              ),
+              space(40),
+              button(
+                  onTap: () async {
+                    cancelToken.cancel();
+
+                    await Future.delayed(const Duration(milliseconds: 600));
+
+                    if (context.mounted) {
+                      backRoute();
+                    }
+                  },
+                  width: getSize().width,
+                  height: 52,
+                  text: appText.cancel,
+                  bgColor: green77(),
+                  textColor: Colors.white),
+              space(30),
+            ],
+          ),
+        );
+      }));
 }

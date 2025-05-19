@@ -1,10 +1,9 @@
-
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:webinar/common/utils/permission_handler.dart';
 
 bool isFlutterLocalNotificationsInitialized = false;
 
@@ -30,7 +29,6 @@ Future<void> setupFlutterNotifications() async {
     defaultPresentAlert: true,
     defaultPresentSound: true,
     defaultPresentBadge: true,
-    
     requestSoundPermission: true,
     requestBadgePermission: true,
   );
@@ -44,18 +42,15 @@ Future<void> setupFlutterNotifications() async {
 
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-
     onDidReceiveNotificationResponse: (details) {
       // var payload = jsonDecode(details.payload ?? '');
     },
-    
   );
-  
 
   await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
 
-
-  await Permission.notification.request();
+  // Request notification permission using the centralized handler
+  await AppPermissionHandler.requestNotification();
 
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
@@ -75,14 +70,16 @@ Future<void> setupFlutterNotifications() async {
     sound: true,
   );
 
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true,);
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   
   isFlutterLocalNotificationsInitialized = true;
 }
 
-
 late AndroidNotificationChannel channel;
-
 
 void showFlutterNotification(RemoteMessage message) {
   RemoteNotification? notification = message.notification;

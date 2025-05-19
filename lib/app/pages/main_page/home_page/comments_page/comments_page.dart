@@ -64,7 +64,7 @@ class _CommentsPageState extends State<CommentsPage> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return directionality(
       child: Scaffold(
-        appBar: appbar(title: appText.comments,background: backgroundColor),
+        appBar: appbar(title: appText.comments),
         backgroundColor: backgroundColor,
 
         body: isLoading
